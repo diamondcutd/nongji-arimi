@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>농지알리미 — 옥토 딥그린 + 빛 효과 변형 3종</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, sans-serif;
+    background: #0D1F17;
+    color: #E8F0EC;
+  }
+  .page-header { text-align: center; padding: 48px 24px 32px; }
+  .page-header h1 {
+    font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px;
+    background: linear-gradient(135deg, #52B788, #95D5B2, #D8F3DC);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .page-header p { color: #6B8F7B; font-size: 16px; }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+  @media (max-width: 1024px) {
+    .options-grid { grid-template-columns: 1fr; max-width: 500px; }
+  }
+
+  .option {
+    background: #132A1E;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(82, 183, 136, 0.12);
+    position: relative;
+  }
+  .option::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 200px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── B-1: 숲속 광선 ── */
+  .opt-b1::before {
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(52,211,153,0.15) 0%, transparent 70%);
+  }
+  /* ── B-2: 달빛 이슬 ── */
+  .opt-b2::before {
+    background: radial-gradient(ellipse 60% 80% at 30% 0%, rgba(167,243,208,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 40% 60% at 80% 10%, rgba(110,231,183,0.08) 0%, transparent 50%);
+  }
+  /* ── B-3: 오로라 그린 ── */
+  .opt-b3::before {
+    background: linear-gradient(135deg, rgba(52,211,153,0.12) 0%, rgba(16,185,129,0.06) 30%, rgba(6,95,70,0.1) 60%, rgba(52,211,153,0.08) 100%);
+  }
+
+  .opt-header {
+    padding: 28px 24px 20px;
+    text-align: center;
+    color: #fff;
+    position: relative; z-index: 1;
+  }
+  .opt-header .label {
+    font-size: 13px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; opacity: 0.6; margin-bottom: 6px;
+  }
+  .opt-header h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+  .opt-header .tagline { font-size: 14px; margin-top: 6px; opacity: 0.7; }
+
+  .color-chips {
+    display: flex; padding: 0 24px; gap: 8px;
+    margin: -12px 0 20px; position: relative; z-index: 1;
+  }
+  .chip {
+    flex: 1; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700;
+  }
+
+  .previews { padding: 0 24px 24px; position: relative; z-index: 1; }
+  .preview-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: #5A7D6A; margin-bottom: 10px; margin-top: 20px;
+  }
+
+  /* Navigation */
+  .nav-mini {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-radius: 12px;
+  }
+  .nav-mini .logo { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; color: #E8F0EC; }
+  .nav-mini .cta {
+    padding: 8px 16px; border-radius: 8px; font-size: 12px;
+    font-weight: 700; border: none; cursor: pointer;
+  }
+
+  /* Hero */
+  .hero-mini {
+    border-radius: 12px; padding: 28px 20px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-mini h3 {
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px;
+    position: relative; z-index: 1;
+  }
+  .hero-mini p { font-size: 13px; margin-bottom: 16px; opacity: 0.75; position: relative; z-index: 1; }
+  .hero-mini .hero-btn {
+    display: inline-block; padding: 12px 24px; border-radius: 10px;
+    font-size: 14px; font-weight: 700; text-decoration: none;
+    position: relative; z-index: 1;
+  }
+
+  /* Card */
+  .card-mini { border-radius: 12px; padding: 16px; }
+  .card-mini .badges { display: flex; gap: 6px; margin-bottom: 10px; }
+  .card-mini .badge-s {
+    padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700;
+  }
+  .card-mini .loc { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .card-mini .meta { font-size: 12px; color: #7A9B8A; margin-bottom: 10px; }
+  .card-mini .price { font-size: 20px; font-weight: 800; }
+  .card-mini hr { border: none; border-top: 1px solid rgba(82,183,136,0.15); margin: 12px 0; }
+  .card-mini .link { font-size: 13px; font-weight: 600; text-decoration: none; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-s {
+    padding: 10px 20px; border-radius: 10px; font-size: 13px;
+    font-weight: 700; border: 2px solid transparent; cursor: pointer;
+  }
+
+  /* Form */
+  .form-mini { border-radius: 12px; padding: 16px; }
+  .form-mini label { font-size: 12px; font-weight: 600; display: block; margin-bottom: 6px; color: #95D5B2; }
+  .form-mini input {
+    width: 100%; padding: 10px 12px; border-radius: 8px;
+    font-size: 13px; font-family: inherit; margin-bottom: 10px; outline: none;
+  }
+
+  /* Email */
+  .email-mini { border-radius: 12px; padding: 20px; }
+  .email-mini .em-header { text-align: center; margin-bottom: 16px; padding-bottom: 12px; }
+  .email-mini .em-header h4 { font-size: 16px; font-weight: 800; }
+  .email-mini .em-header p { font-size: 12px; }
+  .email-mini .em-section { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+  .email-mini .em-card { border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+  .email-mini .em-card .em-loc { font-weight: 700; font-size: 13px; }
+  .email-mini .em-card .em-info { font-size: 11px; margin-top: 2px; }
+  .email-mini .em-card .em-price { font-weight: 800; font-size: 15px; margin-top: 6px; }
+
+  /* Kakao */
+  .kakao-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .kakao-box {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700;
+  }
+  .kakao-plus { font-size: 16px; color: #3D5A4A; }
+
+  /* ── Glow effects ── */
+  .glow-soft { box-shadow: 0 0 20px rgba(52,211,153,0.15), 0 0 60px rgba(52,211,153,0.05); }
+  .glow-medium { box-shadow: 0 0 24px rgba(110,231,183,0.2), 0 0 80px rgba(52,211,153,0.08); }
+  .glow-aurora {
+    box-shadow: 0 0 20px rgba(52,211,153,0.12), 0 4px 40px rgba(16,185,129,0.1),
+                inset 0 1px 0 rgba(167,243,208,0.1);
+  }
+
+  .glow-btn {
+    box-shadow: 0 0 16px rgba(52,211,153,0.3), 0 2px 8px rgba(0,0,0,0.2);
+    transition: box-shadow 0.3s;
+  }
+  .glow-btn:hover { box-shadow: 0 0 24px rgba(52,211,153,0.5), 0 4px 16px rgba(0,0,0,0.3); }
+
+  /* Light beam for hero */
+  .light-beam::after {
+    content: '';
+    position: absolute;
+    top: -40%; right: -20%;
+    width: 60%; height: 120%;
+    background: radial-gradient(ellipse, rgba(167,243,208,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .light-beam-center::after {
+    content: '';
+    position: absolute;
+    top: -30%; left: 20%; right: 20%;
+    height: 100%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(110,231,183,0.18) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .light-beam-aurora::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, rgba(52,211,153,0.08) 0%, transparent 40%,
+                rgba(16,185,129,0.06) 60%, rgba(110,231,183,0.1) 100%);
+    pointer-events: none;
+  }
+
+  /* 비교 테이블 */
+  .summary {
+    max-width: 1400px; margin: 0 auto; padding: 0 24px 60px;
+  }
+  .summary-card {
+    background: #132A1E; border-radius: 20px; padding: 32px;
+    border: 1px solid rgba(82,183,136,0.12);
+  }
+  .summary-card h3 {
+    font-size: 20px; font-weight: 800; margin-bottom: 20px;
+    color: #A7F3D0;
+  }
+  .summary-card table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .summary-card th {
+    text-align: center; padding: 12px 8px; font-weight: 700;
+    border-bottom: 2px solid #2D5A40; color: #95D5B2;
+  }
+  .summary-card th:first-child { text-align: left; }
+  .summary-card td {
+    text-align: center; padding: 12px 8px;
+    border-bottom: 1px solid rgba(82,183,136,0.1); color: #B8D8C8;
+  }
+  .summary-card td:first-child { text-align: left; font-weight: 600; color: #E8F0EC; }
+
+  /* Recommended highlight */
+  .recommended { position: relative; }
+  .recommended::after {
+    content: '추천';
+    position: absolute; top: 12px; right: 12px;
+    background: linear-gradient(135deg, #34D399, #10B981);
+    color: #fff; font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+    box-shadow: 0 0 12px rgba(52,211,153,0.4);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>옥토 딥그린 — 빛이 비치는 변형 3종</h1>
+  <p>깊은 초록 위에 빛과 광택 효과를 더해 고급스러움을 만들다</p>
+</div>
+
+<div class="options-grid">
+
+  <!-- ═══ B-1: 숲속 광선 (Soft Glow) ═══ -->
+  <div class="option opt-b1">
+    <div class="opt-header" style="background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 50%, #1B4332 100%)">
+      <div class="label">B-1</div>
+      <h2>숲속 광선</h2>
+      <div class="tagline">깊은 숲에 한 줄기 빛이 내리는 고요함</div>
+    </div>
+    <div class="color-chips">
+      <div class="chip" style="background:#1B4332;color:#52B788;border:1px solid #2D5A40">#1B4332</div>
+      <div class="chip" style="background:#34D399;color:#0D1F17">#34D399</div>
+      <div class="chip" style="background:#E8A830;color:#0D1F17">#E8A830</div>
+      <div class="chip" style="background:#0F2A1D;color:#5A7D6A;border:1px solid #1B4332">#0F2A1D</div>
+    </div>
+    <div class="previews">
+      <div class="preview-label">Navigation</div>
+      <div class="nav-mini" style="background:#0F2A1D;border:1px solid rgba(52,211,153,0.1)">
+        <div class="logo">농지<span style="color:#34D399">알리미</span></div>
+        <button class="cta glow-btn" style="background:#34D399;color:#0D1F17">시작하기</button>
+      </div>
+
+      <div class="preview-label">Landing Hero</div>
+      <div class="hero-mini light-beam" style="background:linear-gradient(160deg, #1B4332 0%, #2D6A4F 60%, #1B4332 100%);color:#fff">
+        <h3>당신의 농지,<br>알리미가 찾아드려요</h3>
+        <p>조건만 설정하면 딱 맞는 매물을 매일 알려드립니다</p>
+        <a href="#" class="hero-btn glow-btn" style="background:#34D399;color:#0D1F17">무료로 시작하기</a>
+      </div>
+
+      <div class="preview-label">Listing Card</div>
+      <div class="card-mini glow-soft" style="background:#162E22;border:1px solid rgba(52,211,153,0.1)">
+        <div class="badges">
+          <span class="badge-s" style="background:rgba(52,211,153,0.15);color:#34D399">새 매물</span>
+          <span class="badge-s" style="background:rgba(255,255,255,0.06);color:#7A9B8A">임대-수탁</span>
+        </div>
+        <div class="loc">전북 군산시 성산면 산곡리</div>
+        <div class="meta">답 (논) · 4,000㎡ (1,210평)</div>
+        <div class="price" style="color:#34D399">160만원 /년</div>
+        <hr>
+        <a href="#" class="link" style="color:#52B788">농지은행에서 보기 →</a>
+      </div>
+
+      <div class="preview-label">Form Input</div>
+      <div class="form-mini" style="background:#162E22;border:1px solid rgba(52,211,153,0.08)">
+        <label>이메일</label>
+        <input type="text" placeholder="이메일을 입력하세요" style="border:1px solid rgba(52,211,153,0.2);background:#0F2A1D;color:#D8F3DC">
+        <button class="btn-s glow-btn" style="background:#34D399;color:#0D1F17;width:100%;border:none">알림 조건 저장</button>
+      </div>
+
+      <div class="preview-label">Buttons</div>
+      <div class="btn-row">
+        <button class="btn-s glow-btn" style="background:#34D399;color:#0D1F17">Primary</button>
+        <button class="btn-s" style="background:#E8A830;color:#0D1F17">Accent</button>
+        <button class="btn-s" style="background:transparent;color:#34D399;border-color:rgba(52,211,153,0.4)">Outline</button>
+      </div>
+
+      <div class="preview-label">Email Digest</div>
+      <div class="email-mini" style="background:#FAFAF8;border-top:4px solid #34D399;color:#1A1A1A">
+        <div class="em-header">
+          <h4 style="color:#1A1A1A">농지<span style="color:#2D6A4F">알리미</span></h4>
+          <p style="color:#888">새 매물 3건을 찾았어요!</p>
+        </div>
+        <div class="em-section" style="color:#E65100">🔴 마감 임박</div>
+        <div class="em-card" style="background:#F0FAF5;border:1px solid #D1E8DC">
+          <div class="em-loc" style="color:#1A1A1A">전북 군산시 옥구읍 상평리</div>
+          <div class="em-info" style="color:#888">답 · 6,001㎡ · 임대-수탁</div>
+          <div class="em-price" style="color:#2D6A4F">132만원 /년</div>
+        </div>
+        <div class="em-section" style="color:#2D6A4F">🆕 오늘 새 매물</div>
+        <div class="em-card" style="background:#F0FAF5;border:1px solid #D1E8DC">
+          <div class="em-loc" style="color:#1A1A1A">전북 군산시 성산면 산곡리</div>
+          <div class="em-info" style="color:#888">답 · 4,000㎡ · 임대-공공임대</div>
+          <div class="em-price" style="color:#2D6A4F">160만원 /년</div>
+        </div>
+      </div>
+
+      <div class="preview-label">카카오 조합</div>
+      <div class="kakao-row">
+        <div class="kakao-box" style="background:#FEE500;color:#1A1A1A">카카오</div>
+        <span class="kakao-plus">+</span>
+        <div class="kakao-box glow-soft" style="background:#1B4332;color:#34D399;border:1px solid rgba(52,211,153,0.3)">알리미</div>
+        <span class="kakao-plus">=</span>
+        <div class="kakao-box" style="background:#E8A830;color:#0D1F17">조화</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ B-2: 달빛 이슬 (Luminous Dew) — 추천 ═══ -->
+  <div class="option opt-b2 recommended">
+    <div class="opt-header" style="background:linear-gradient(135deg, #1B4332 0%, #264F3A 50%, #1B4332 100%)">
+      <div class="label">B-2</div>
+      <h2>달빛 이슬</h2>
+      <div class="tagline">달빛 아래 이슬 맺힌 옥토의 윤기</div>
+    </div>
+    <div class="color-chips">
+      <div class="chip" style="background:#1B4332;color:#6EE7B7;border:1px solid #2D5A40">#1B4332</div>
+      <div class="chip" style="background:#6EE7B7;color:#0D1F17">#6EE7B7</div>
+      <div class="chip" style="background:#F0B429;color:#0D1F17">#F0B429</div>
+      <div class="chip" style="background:#0F2A1D;color:#5A7D6A;border:1px solid #1B4332">#0F2A1D</div>
+    </div>
+    <div class="previews">
+      <div class="preview-label">Navigation</div>
+      <div class="nav-mini" style="background:linear-gradient(90deg, #0F2A1D 0%, #162E22 50%, #0F2A1D 100%);border:1px solid rgba(110,231,183,0.08)">
+        <div class="logo">농지<span style="color:#6EE7B7">알리미</span></div>
+        <button class="cta" style="background:linear-gradient(135deg, #6EE7B7, #34D399);color:#0D1F17;box-shadow:0 0 12px rgba(110,231,183,0.3)">시작하기</button>
+      </div>
+
+      <div class="preview-label">Landing Hero</div>
+      <div class="hero-mini light-beam-center" style="background:linear-gradient(180deg, #1B4332 0%, #234A3A 40%, #1B4332 100%);color:#fff">
+        <h3 style="background:linear-gradient(180deg, #fff 0%, #A7F3D0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">당신의 농지,<br>알리미가 찾아드려요</h3>
+        <p>조건만 설정하면 딱 맞는 매물을 매일 알려드립니다</p>
+        <a href="#" class="hero-btn" style="background:linear-gradient(135deg, #6EE7B7, #34D399);color:#0D1F17;box-shadow:0 0 20px rgba(110,231,183,0.35)">무료로 시작하기</a>
+      </div>
+
+      <div class="preview-label">Listing Card</div>
+      <div class="card-mini glow-medium" style="background:linear-gradient(135deg, #162E22, #1A3629);border:1px solid rgba(110,231,183,0.1)">
+        <div class="badges">
+          <span class="badge-s" style="background:rgba(110,231,183,0.12);color:#6EE7B7;box-shadow:0 0 8px rgba(110,231,183,0.15)">새 매물</span>
+          <span class="badge-s" style="background:rgba(255,255,255,0.05);color:#7A9B8A">임대-수탁</span>
+        </div>
+        <div class="loc">전북 군산시 성산면 산곡리</div>
+        <div class="meta">답 (논) · 4,000㎡ (1,210평)</div>
+        <div class="price" style="color:#6EE7B7;text-shadow:0 0 16px rgba(110,231,183,0.3)">160만원 /년</div>
+        <hr>
+        <a href="#" class="link" style="color:#6EE7B7">농지은행에서 보기 →</a>
+      </div>
+
+      <div class="preview-label">Form Input</div>
+      <div class="form-mini" style="background:#162E22;border:1px solid rgba(110,231,183,0.08)">
+        <label style="color:#6EE7B7">이메일</label>
+        <input type="text" placeholder="이메일을 입력하세요" style="border:1px solid rgba(110,231,183,0.15);background:#0F2A1D;color:#D8F3DC">
+        <button class="btn-s" style="background:linear-gradient(135deg,#6EE7B7,#34D399);color:#0D1F17;width:100%;border:none;box-shadow:0 0 12px rgba(110,231,183,0.25)">알림 조건 저장</button>
+      </div>
+
+      <div class="preview-label">Buttons</div>
+      <div class="btn-row">
+        <button class="btn-s" style="background:linear-gradient(135deg,#6EE7B7,#34D399);color:#0D1F17;box-shadow:0 0 12px rgba(110,231,183,0.25)">Primary</button>
+        <button class="btn-s" style="background:#F0B429;color:#0D1F17">Accent</button>
+        <button class="btn-s" style="background:transparent;color:#6EE7B7;border-color:rgba(110,231,183,0.3);box-shadow:0 0 8px rgba(110,231,183,0.1)">Outline</button>
+      </div>
+
+      <div class="preview-label">Email Digest</div>
+      <div class="email-mini" style="background:#FAFAF8;border-top:4px solid #2D6A4F;color:#1A1A1A;box-shadow:0 0 20px rgba(110,231,183,0.08)">
+        <div class="em-header" style="border-bottom:1px solid #E8E8E4">
+          <h4 style="color:#1A1A1A">농지<span style="color:#2D6A4F">알리미</span></h4>
+          <p style="color:#888">새 매물 3건을 찾았어요!</p>
+        </div>
+        <div class="em-section" style="color:#E65100">🔴 마감 임박</div>
+        <div class="em-card" style="background:#fff;border-left:3px solid #E65100">
+          <div class="em-loc" style="color:#1A1A1A">전북 군산시 옥구읍 상평리</div>
+          <div class="em-info" style="color:#888">답 · 6,001㎡ · 임대-수탁</div>
+          <div class="em-price" style="color:#2D6A4F">132만원 /년</div>
+        </div>
+        <div class="em-section" style="color:#2D6A4F">🆕 오늘 새 매물</div>
+        <div class="em-card" style="background:#fff;border-left:3px solid #2D6A4F">
+          <div class="em-loc" style="color:#1A1A1A">전북 군산시 성산면 산곡리</div>
+          <div class="em-info" style="color:#888">답 · 4,000㎡ · 임대-공공임대</div>
+          <div class="em-price" style="color:#2D6A4F">160만원 /년</div>
+        </div>
+      </div>
+
+      <div class="preview-label">카카오 조합</div>
+      <div class="kakao-row">
+        <div class="kakao-box" style="background:#FEE500;color:#1A1A1A">카카오</div>
+        <span class="kakao-plus">+</span>
+        <div class="kakao-box" style="background:#1B4332;color:#6EE7B7;border:1px solid rgba(110,231,183,0.3);box-shadow:0 0 8px rgba(110,231,183,0.2)">알리미</div>
+        <span class="kakao-plus">=</span>
+        <div class="kakao-box" style="background:#F0B429;color:#0D1F17">조화</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ B-3: 오로라 그린 (Aurora Glow) ═══ -->
+  <div class="option opt-b3">
+    <div class="opt-header" style="background:linear-gradient(135deg, #1B4332 0%, #2D6A4F 30%, #1B5E40 60%, #1B4332 100%)">
+      <div class="label">B-3</div>
+      <h2>오로라 그린</h2>
+      <div class="tagline">자연의 오로라처럼 은은하게 물드는 빛</div>
+    </div>
+    <div class="color-chips">
+      <div class="chip" style="background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#95D5B2;border:1px solid #2D5A40">#1B4332</div>
+      <div class="chip" style="background:linear-gradient(135deg,#34D399,#6EE7B7);color:#0D1F17">#34~#6E</div>
+      <div class="chip" style="background:#D4A843;color:#0D1F17">#D4A843</div>
+      <div class="chip" style="background:linear-gradient(135deg,#0F2A1D,#162E22);color:#5A7D6A;border:1px solid #1B4332">gradient</div>
+    </div>
+    <div class="previews">
+      <div class="preview-label">Navigation</div>
+      <div class="nav-mini" style="background:linear-gradient(90deg, #0F2A1D, #132A1E, #0F2A1D);border:1px solid rgba(52,211,153,0.06)">
+        <div class="logo" style="background:linear-gradient(90deg, #95D5B2, #34D399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">농지알리미</div>
+        <button class="cta" style="background:linear-gradient(135deg, #34D399 0%, #6EE7B7 50%, #34D399 100%);color:#0D1F17;box-shadow:0 0 16px rgba(52,211,153,0.25)">시작하기</button>
+      </div>
+
+      <div class="preview-label">Landing Hero</div>
+      <div class="hero-mini light-beam-aurora" style="background:linear-gradient(135deg, #1B4332 0%, #234A3A 25%, #2D6A4F 50%, #234A3A 75%, #1B4332 100%);color:#fff">
+        <h3 style="background:linear-gradient(135deg, #D8F3DC, #95D5B2, #D8F3DC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">당신의 농지,<br>알리미가 찾아드려요</h3>
+        <p>조건만 설정하면 딱 맞는 매물을 매일 알려드립니다</p>
+        <a href="#" class="hero-btn" style="background:linear-gradient(135deg, #34D399, #6EE7B7, #34D399);color:#0D1F17;box-shadow:0 0 24px rgba(52,211,153,0.3)">무료로 시작하기</a>
+      </div>
+
+      <div class="preview-label">Listing Card</div>
+      <div class="card-mini glow-aurora" style="background:linear-gradient(135deg, #162E22, #1A3629, #162E22);border:1px solid rgba(82,183,136,0.08)">
+        <div class="badges">
+          <span class="badge-s" style="background:linear-gradient(135deg, rgba(52,211,153,0.15), rgba(110,231,183,0.1));color:#6EE7B7;box-shadow:0 0 8px rgba(52,211,153,0.1)">새 매물</span>
+          <span class="badge-s" style="background:rgba(255,255,255,0.05);color:#7A9B8A">임대-수탁</span>
+        </div>
+        <div class="loc">전북 군산시 성산면 산곡리</div>
+        <div class="meta">답 (논) · 4,000㎡ (1,210평)</div>
+        <div class="price" style="background:linear-gradient(90deg,#34D399,#6EE7B7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">160만원 /년</div>
+        <hr>
+        <a href="#" class="link" style="color:#52B788">농지은행에서 보기 →</a>
+      </div>
+
+      <div class="preview-label">Form Input</div>
+      <div class="form-mini" style="background:linear-gradient(135deg, #162E22, #1A3228);border:1px solid rgba(52,211,153,0.06)">
+        <label style="background:linear-gradient(90deg,#95D5B2,#6EE7B7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">이메일</label>
+        <input type="text" placeholder="이메일을 입력하세요" style="border:1px solid rgba(52,211,153,0.12);background:#0F2A1D;color:#D8F3DC">
+        <button class="btn-s" style="background:linear-gradient(135deg,#34D399,#6EE7B7,#34D399);color:#0D1F17;width:100%;border:none;box-shadow:0 0 16px rgba(52,211,153,0.2)">알림 조건 저장</button>
+      </div>
+
+      <div class="preview-label">Buttons</div>
+      <div class="btn-row">
+        <button class="btn-s" style="background:linear-gradient(135deg,#34D399,#6EE7B7);color:#0D1F17;box-shadow:0 0 12px rgba(52,211,153,0.2)">Primary</button>
+        <button class="btn-s" style="background:linear-gradient(135deg,#D4A843,#F0B429);color:#0D1F17">Accent</button>
+        <button class="btn-s" style="background:transparent;color:#52B788;border-color:rgba(82,183,136,0.25)">Outline</button>
+      </div>
+
+      <div class="preview-label">Email Digest</div>
+      <div class="email-mini" style="background:#FAFAF8;border-top:4px solid;border-image:linear-gradient(90deg,#2D6A4F,#34D399,#2D6A4F)1;color:#1A1A1A">
+        <div class="em-header">
+          <h4 style="color:#1A1A1A">농지<span style="background:linear-gradient(90deg,#2D6A4F,#1B4332);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">알리미</span></h4>
+          <p style="color:#888">새 매물 3건을 찾았어요!</p>
+        </div>
+        <div class="em-section" style="color:#E65100">🔴 마감 임박</div>
+        <div class="em-card" style="background:linear-gradient(135deg,#F0FAF5,#FAFAF8);border-left:3px solid #E65100">
+          <div class="em-loc" style="color:#1A1A1A">전북 군산시 옥구읍 상평리</div>
+          <div class="em-info" style="color:#888">답 · 6,001㎡ · 임대-수탁</div>
+          <div class="em-price" style="color:#2D6A4F">132만원 /년</div>
+        </div>
+        <div class="em-section" style="color:#2D6A4F">🆕 오늘 새 매물</div>
+        <div class="em-card" style="background:linear-gradient(135deg,#F0FAF5,#FAFAF8);border-left:3px solid #2D6A4F">
+          <div class="em-loc" style="color:#1A1A1A">전북 군산시 성산면 산곡리</div>
+          <div class="em-info" style="color:#888">답 · 4,000㎡ · 임대-공공임대</div>
+          <div class="em-price" style="color:#2D6A4F">160만원 /년</div>
+        </div>
+      </div>
+
+      <div class="preview-label">카카오 조합</div>
+      <div class="kakao-row">
+        <div class="kakao-box" style="background:#FEE500;color:#1A1A1A">카카오</div>
+        <span class="kakao-plus">+</span>
+        <div class="kakao-box" style="background:linear-gradient(135deg,#1B4332,#2D6A4F);color:#6EE7B7;border:1px solid rgba(110,231,183,0.2);box-shadow:0 0 12px rgba(52,211,153,0.15)">알리미</div>
+        <span class="kakao-plus">=</span>
+        <div class="kakao-box" style="background:linear-gradient(135deg,#D4A843,#F0B429);color:#0D1F17">조화</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── 비교 요약 ── -->
+<div class="summary">
+  <div class="summary-card">
+    <h3>옥토 딥그린 + 빛 효과 비교</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left"></th>
+          <th style="color:#34D399">B-1. 숲속 광선</th>
+          <th style="color:#6EE7B7">B-2. 달빛 이슬</th>
+          <th style="color:#52B788">B-3. 오로라 그린</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>빛 효과</td>
+          <td>단일 radial glow<br><span style="font-size:12px;color:#5A7D6A">위에서 아래로 퍼지는 빛</span></td>
+          <td>이중 포인트 glow<br><span style="font-size:12px;color:#5A7D6A">두 곳에서 은은하게 빛남</span></td>
+          <td>그라디언트 오로라<br><span style="font-size:12px;color:#5A7D6A">전체가 은은하게 물드는</span></td>
+        </tr>
+        <tr>
+          <td>고급스러움</td>
+          <td>⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐⭐</td>
+          <td>⭐⭐⭐⭐</td>
+        </tr>
+        <tr>
+          <td>가독성</td>
+          <td>⭐⭐⭐⭐ 높은 명암비</td>
+          <td>⭐⭐⭐⭐⭐ 밝은 포인트가 시선 유도</td>
+          <td>⭐⭐⭐ 그라디언트가 많아 약간 산만</td>
+        </tr>
+        <tr>
+          <td>분위기</td>
+          <td>클래식 · 안정감</td>
+          <td>모던 · 세련됨</td>
+          <td>트렌디 · 감각적</td>
+        </tr>
+        <tr>
+          <td>이메일 호환</td>
+          <td>⭐⭐⭐⭐ 밝은 배경 사용</td>
+          <td>⭐⭐⭐⭐⭐ 밝은 배경 + 포인트</td>
+          <td>⭐⭐⭐ 그라디언트 이메일 제한적</td>
+        </tr>
+        <tr>
+          <td>카카오 조합</td>
+          <td>⭐⭐⭐⭐ 골드 악센트로 연결</td>
+          <td>⭐⭐⭐⭐⭐ 발광 그린 + 옐로 자연스러움</td>
+          <td>⭐⭐⭐⭐ 그라디언트로 변화감</td>
+        </tr>
+        <tr>
+          <td>참고 레퍼런스</td>
+          <td>Notion Dark · Linear</td>
+          <td>Vercel · Stripe Dark</td>
+          <td>Raycast · Arc Browser</td>
+        </tr>
+        <tr>
+          <td style="font-weight:800">총평</td>
+          <td>절제된 고급감<br>안전한 선택</td>
+          <td style="background:rgba(110,231,183,0.08);font-weight:700;color:#6EE7B7">✅ 고급 + 가독성 + 실용성<br>균형 최적</td>
+          <td>감각적이지만<br>구현 복잡도 높음</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

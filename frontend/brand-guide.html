@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>농지알리미 — 브랜드 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #FAFAF8;
+    color: #1A1A1A;
+    line-height: 1.6;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 60px 24px; }
+
+  h1 {
+    font-size: 40px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+  }
+  h1 .accent { color: #2B7A4B; }
+  .subtitle {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 60px;
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #1A1A1A;
+  }
+
+  section { margin-bottom: 64px; }
+
+  /* ── 컬러 팔레트 ── */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .color-card {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .color-swatch {
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+  }
+  .color-swatch span {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.85);
+    color: #1A1A1A;
+  }
+  .color-info {
+    padding: 14px 16px;
+  }
+  .color-info .name {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+  .color-info .role {
+    font-size: 13px;
+    color: #888;
+  }
+
+  /* ── 타이포그래피 ── */
+  .type-sample {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .type-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2B7A4B;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  /* ── 컴포넌트 프리뷰 ── */
+  .preview-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.3px;
+  }
+  .btn-primary {
+    background: #2B7A4B;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #236B3F; }
+  .btn-secondary {
+    background: #F0F0EC;
+    color: #1A1A1A;
+  }
+  .btn-secondary:hover { background: #E5E5E0; }
+  .btn-accent {
+    background: #E8A830;
+    color: #1A1A1A;
+  }
+  .btn-accent:hover { background: #D49A28; }
+  .btn-outline {
+    background: transparent;
+    color: #2B7A4B;
+    border: 2px solid #2B7A4B;
+  }
+  .btn-outline:hover { background: #2B7A4B; color: #fff; }
+
+  /* ── 카드 프리뷰 ── */
+  .card-preview {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    max-width: 400px;
+  }
+  .card-preview .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .badge-new { background: #E8F5E9; color: #2B7A4B; }
+  .badge-urgent { background: #FFF3E0; color: #E65100; }
+  .badge-type { background: #F0F0EC; color: #555; }
+  .card-preview .location {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1A1A1A;
+  }
+  .card-preview .meta {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .card-preview .price {
+    font-size: 22px;
+    font-weight: 800;
+    color: #2B7A4B;
+  }
+  .card-divider {
+    border: none;
+    border-top: 1px solid #F0F0EC;
+    margin: 16px 0;
+  }
+  .card-preview .detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #2B7A4B;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .card-preview .detail-link:hover { text-decoration: underline; }
+
+  /* ── 네비게이션 프리뷰 ── */
+  .nav-preview {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+  }
+  .nav-logo {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .nav-logo .green { color: #2B7A4B; }
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .nav-links a {
+    text-decoration: none;
+    color: #666;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  .nav-links a:hover { color: #1A1A1A; }
+
+  /* ── 토스트 프리뷰 ── */
+  .toast-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #1A1A1A;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .toast-preview .icon { font-size: 18px; }
+
+  /* ── 인풋 프리뷰 ── */
+  .input-preview {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    max-width: 400px;
+  }
+  .form-group { margin-bottom: 20px; }
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1A1A1A;
+  }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #E5E5E0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #FAFAF8;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: #2B7A4B;
+    background: #fff;
+  }
+
+  /* ── 브랜드 스토리 ── */
+  .brand-story {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .brand-story p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 16px;
+  }
+  .brand-story strong { color: #2B7A4B; }
+  .brand-keyword {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #E8F5E9;
+    color: #2B7A4B;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    margin: 4px;
+  }
+
+  /* ── 이메일 프리뷰 미니 ── */
+  .email-mini {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    max-width: 500px;
+    border-top: 4px solid #2B7A4B;
+  }
+  .email-mini .email-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .email-mini .email-header h3 {
+    font-size: 20px;
+    font-weight: 800;
+  }
+  .email-mini .email-header p {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+  }
+  .email-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #E65100;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .email-card {
+    background: #FAFAF8;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .email-card .loc { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .email-card .info { font-size: 13px; color: #666; }
+  .email-card .ep { font-weight: 700; color: #2B7A4B; font-size: 16px; margin-top: 8px; }
+
+  /* ── Comparison ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .compare-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .compare-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .compare-card.before { border-top: 3px solid #888; }
+  .compare-card.after { border-top: 3px solid #2B7A4B; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ── 헤더 ── -->
+  <h1>농지<span class="accent">알리미</span> Brand Guide</h1>
+  <p class="subtitle">뉴닉의 깔끔함 + 농지의 따뜻함 + 카카오와 어울리는 브랜드 아이덴티티</p>
+
+  <!-- ── 브랜드 스토리 ── -->
+  <section>
+    <h2>브랜드 컨셉</h2>
+    <div class="brand-story">
+      <p>
+        농지알리미의 캐릭터 <strong>'알리미'</strong>는 우렁각시 콘셉트입니다.
+        사용자가 바쁜 일상을 보내는 동안, 몰래 농지를 찾아서 알려주는 든든한 존재.
+        브랜드 톤은 <strong>믿음직하고 따뜻하면서도, 정보는 날카롭게</strong> 전달합니다.
+      </p>
+      <p>
+        뉴닉이 "뉴스를 쉽게" 만들었듯, 농지알리미는 <strong>"농지 찾기를 쉽게"</strong> 만듭니다.
+        복잡한 농지은행 사이트를 대신 뒤져서, 딱 맞는 매물만 골라 보내드립니다.
+      </p>
+      <div style="margin-top: 20px;">
+        <span class="brand-keyword">든든한 조력자</span>
+        <span class="brand-keyword">깔끔한 정보</span>
+        <span class="brand-keyword">따뜻한 농촌</span>
+        <span class="brand-keyword">귀농의 첫걸음</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 컬러 팔레트 ── -->
+  <section>
+    <h2>컬러 시스템</h2>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background:#2B7A4B"><span>#2B7A4B</span></div>
+        <div class="color-info">
+          <div class="name">풍요 초록</div>
+          <div class="role">Primary — 브랜드 메인 컬러. CTA, 로고, 핵심 액센트</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#E8A830"><span>#E8A830</span></div>
+        <div class="color-info">
+          <div class="name">벼이삭 골드</div>
+          <div class="role">Secondary — 카카오 친화, 강조, 새 매물 하이라이트</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#E65100"><span>#E65100</span></div>
+        <div class="color-info">
+          <div class="name">마감 오렌지</div>
+          <div class="role">Alert — 마감 임박, 긴급 알림</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#1A1A1A"><span style="color:#fff;background:rgba(0,0,0,0.3)">#1A1A1A</span></div>
+        <div class="color-info">
+          <div class="name">먹색</div>
+          <div class="role">Text Primary — 제목, 본문, 네비게이션</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#FAFAF8"><span>#FAFAF8</span></div>
+        <div class="color-info">
+          <div class="name">한지 베이지</div>
+          <div class="role">Background — 따뜻한 오프화이트 배경</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#F0F0EC"><span>#F0F0EC</span></div>
+        <div class="color-info">
+          <div class="name">논둑 그레이</div>
+          <div class="role">Surface — 카드 배경, 구분선, 보조 영역</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#E8F5E9"><span>#E8F5E9</span></div>
+        <div class="color-info">
+          <div class="name">새싹 틴트</div>
+          <div class="role">Light accent — 뱃지 배경, 성공 상태</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#FFF3E0"><span>#FFF3E0</span></div>
+        <div class="color-info">
+          <div class="name">황토 틴트</div>
+          <div class="role">Warning bg — 경고 배경, 마감 임박 배경</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 타이포그래피 ── -->
+  <section>
+    <h2>타이포그래피</h2>
+    <div class="type-sample">
+      <div class="type-label">Font Family</div>
+      <p style="font-size:20px;font-weight:700;margin-bottom:16px;">Pretendard — 깔끔하고 가독성 좋은 한글 서체</p>
+      <p style="font-size:14px;color:#888;">뉴닉, 토스, 당근마켓과 같은 국내 서비스에서 사용하는 모던 고딕 서체</p>
+    </div>
+    <div class="type-sample">
+      <div class="type-label">Heading Hierarchy</div>
+      <p style="font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px;">농지알리미 H1 — 800</p>
+      <p style="font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;">섹션 제목 H2 — 700</p>
+      <p style="font-size:20px;font-weight:700;margin-bottom:8px;">카드 제목 H3 — 700</p>
+      <p style="font-size:16px;font-weight:500;margin-bottom:8px;">본문 텍스트 Body — 500</p>
+      <p style="font-size:14px;font-weight:400;color:#888;">보조 텍스트 Caption — 400</p>
+    </div>
+  </section>
+
+  <!-- ── 컴포넌트: 버튼 ── -->
+  <section>
+    <h2>버튼</h2>
+    <div class="preview-row">
+      <button class="btn btn-primary">조건 추가하기</button>
+      <button class="btn btn-accent">무료로 시작하기</button>
+      <button class="btn btn-outline">상세보기</button>
+      <button class="btn btn-secondary">취소</button>
+    </div>
+  </section>
+
+  <!-- ── 컴포넌트: 네비게이션 ── -->
+  <section>
+    <h2>네비게이션</h2>
+    <div class="nav-preview">
+      <div class="nav-logo">농지<span class="green">알리미</span></div>
+      <div class="nav-links">
+        <a href="#">서비스 소개</a>
+        <a href="#">요금제</a>
+        <button class="btn btn-primary" style="padding:10px 20px;font-size:14px;">시작하기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 컴포넌트: 매물 카드 ── -->
+  <section>
+    <h2>매물 카드</h2>
+    <div class="preview-row" style="align-items:flex-start">
+      <div class="card-preview">
+        <span class="badge badge-new">새 매물</span>
+        <span class="badge badge-type">임대-수탁</span>
+        <div class="location">전북특별자치도 군산시 성산면 산곡리</div>
+        <div class="meta">답 (논) · 4,000㎡ (1,210평) · 필지 1개</div>
+        <div class="price">160만원 /년</div>
+        <hr class="card-divider">
+        <a href="#" class="detail-link">농지은행에서 보기 →</a>
+      </div>
+
+      <div class="card-preview" style="border-left:3px solid #E65100">
+        <span class="badge badge-urgent">D-3 마감임박</span>
+        <span class="badge badge-type">매도-맞춤형</span>
+        <div class="location">경기도 파주시 적성면 구읍리</div>
+        <div class="meta">전 (밭) · 2,500㎡ (756평) · 필지 2개</div>
+        <div class="price">1억 2,000만원</div>
+        <hr class="card-divider">
+        <a href="#" class="detail-link">농지은행에서 보기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 컴포넌트: 폼 ── -->
+  <section>
+    <h2>폼 인풋</h2>
+    <div class="input-preview">
+      <div class="form-group">
+        <label>이메일</label>
+        <input type="email" placeholder="이메일을 입력하세요">
+      </div>
+      <div class="form-group">
+        <label>지역 선택</label>
+        <select><option>전북특별자치도</option></select>
+      </div>
+      <button class="btn btn-primary" style="width:100%">알림 조건 저장</button>
+    </div>
+  </section>
+
+  <!-- ── 컴포넌트: 토스트 ── -->
+  <section>
+    <h2>토스트 알림</h2>
+    <div class="preview-row" style="flex-direction:column;gap:12px">
+      <div class="toast-preview"><span class="icon">✅</span> 알림 조건이 저장되었습니다</div>
+      <div class="toast-preview" style="background:#E65100"><span class="icon">⚠️</span> 세션이 만료되었습니다. 다시 로그인해주세요</div>
+    </div>
+  </section>
+
+  <!-- ── 이메일 프리뷰 ── -->
+  <section>
+    <h2>이메일 다이제스트 (미니 프리뷰)</h2>
+    <div class="email-mini">
+      <div class="email-header">
+        <h3>농지<span style="color:#2B7A4B">알리미</span></h3>
+        <p>새 매물 3건을 찾았어요!</p>
+      </div>
+      <div class="email-section-title">🔴 마감 임박 (D-7 이내)</div>
+      <div class="email-card">
+        <div class="loc">전북 군산시 옥구읍 상평리</div>
+        <div class="info">답 (논) · 6,001㎡ · 임대-수탁</div>
+        <div class="ep">132만원 /년</div>
+      </div>
+      <div class="email-section-title" style="color:#2B7A4B;">🆕 오늘 새 매물</div>
+      <div class="email-card">
+        <div class="loc">전북 군산시 성산면 산곡리</div>
+        <div class="info">답 (논) · 4,000㎡ · 임대-공공임대용</div>
+        <div class="ep">160만원 /년</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 카카오 호환성 ── -->
+  <section>
+    <h2>카카오 호환성</h2>
+    <div class="brand-story">
+      <p>
+        <strong>풍요 초록(#2B7A4B)</strong>은 카카오의 <span style="display:inline-block;width:14px;height:14px;background:#FEE500;border-radius:3px;vertical-align:middle"></span> 노란색과 보색 관계로 시각적 대비가 뛰어납니다.
+        카카오톡 알림톡에서 농지알리미 메시지가 도착했을 때 즉시 브랜드를 인식할 수 있습니다.
+      </p>
+      <p>
+        <strong>벼이삭 골드(#E8A830)</strong>를 서브 컬러로 사용해 카카오 생태계와 따뜻한 톤으로 연결됩니다.
+        초록+골드 조합은 "풍요로운 농지"를 직관적으로 연상시키며, 다른 농업 서비스와도 차별화됩니다.
+      </p>
+      <div style="display:flex;gap:12px;margin-top:20px;align-items:center">
+        <div style="width:60px;height:60px;background:#FEE500;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">카카오</div>
+        <div style="font-size:24px;color:#ccc">+</div>
+        <div style="width:60px;height:60px;background:#2B7A4B;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">알리미</div>
+        <div style="font-size:24px;color:#ccc">=</div>
+        <div style="width:60px;height:60px;background:#E8A830;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">조화</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 디자인 원칙 ── -->
+  <section>
+    <h2>디자인 원칙</h2>
+    <div class="compare-grid">
+      <div class="compare-card before">
+        <h3>❌ 이렇게 하지 않아요</h3>
+        <p style="font-size:14px;color:#888;line-height:1.6;">
+          어두운 배경에 작은 텍스트<br>
+          과도한 그라데이션과 그림자<br>
+          복잡한 레이아웃<br>
+          정보 과부하
+        </p>
+      </div>
+      <div class="compare-card after">
+        <h3>✅ 이렇게 해요</h3>
+        <p style="font-size:14px;color:#444;line-height:1.6;">
+          밝은 배경에 큰 텍스트<br>
+          플랫 디자인, 최소한의 그림자<br>
+          넉넉한 여백과 시선 흐름<br>
+          핵심 정보만 전달
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <p style="text-align:center;color:#888;font-size:13px;padding:40px 0;">
+    농지알리미 브랜드 가이드 v1.0 — 2026.04.01
+  </p>
+
+</div>
+</body>
+</html>

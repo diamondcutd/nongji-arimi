@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>대시보드 — 농지알리미</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:           #F7F7F8;
+  --card:         #FFFFFF;
+  --text:         #202123;
+  --sub:          #6b7280;
+  --border:       rgba(0,0,0,0.08);
+  --header-bd:    rgba(0,0,0,0.07);
+  --hbtn-color:   #202123;
+  --hbtn-border:  rgba(0,0,0,0.18);
+  --icon-bg:      #FFF7E6;
+  --icon-border:  rgba(245,158,11,0.2);
+  --badge-bg:     #FFF7E6;
+  --badge-color:  #B45309;
+  --input-bg:     #FFFFFF;
+  --input-border: rgba(0,0,0,0.15);
+  --input-focus:  #F59E0B;
+  --footer-color: #b0b0b0;
+  --empty-color:  #d1d5db;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:           #202123;
+    --card:         #2A2B32;
+    --text:         #FFFFFF;
+    --sub:          #B4B7C1;
+    --border:       rgba(255,255,255,0.07);
+    --header-bd:    rgba(255,255,255,0.07);
+    --hbtn-color:   #B4B7C1;
+    --hbtn-border:  rgba(255,255,255,0.15);
+    --icon-bg:      rgba(245,158,11,0.1);
+    --icon-border:  rgba(245,158,11,0.2);
+    --badge-bg:     rgba(245,158,11,0.12);
+    --badge-color:  #F59E0B;
+    --input-bg:     #2A2B32;
+    --input-border: rgba(255,255,255,0.15);
+    --input-focus:  #F59E0B;
+    --footer-color: #4a4b52;
+    --empty-color:  #4a4b52;
+  }
+}
+
+body {
+  font-family: -apple-system, 'Pretendard', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 420px;
+  margin: 0 auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--header-bd);
+}
+.header-logo {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text);
+  text-decoration: none;
+}
+.header-logo em { font-style: normal; color: #F59E0B; }
+.header-login {
+  background: transparent;
+  border: 0.5px solid var(--hbtn-border);
+  color: var(--hbtn-color);
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── 사용자 정보 카드 ── */
+.user-card {
+  margin: 24px 20px 0;
+  padding: 22px 20px;
+  background: var(--card);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+}
+.user-card .greeting {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+.user-card .greeting span { color: #F59E0B; }
+.user-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--sub);
+}
+.plan-badge {
+  display: inline-block;
+  background: var(--badge-bg);
+  color: var(--badge-color);
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── 알림 조건 섹션 ── */
+.section {
+  padding: 28px 20px 0;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.add-btn {
+  background: #F59E0B;
+  color: #fff;
+  border: none;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.condition-card {
+  background: var(--card);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.condition-card + .condition-card { margin-top: 10px; }
+.condition-card .label {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.condition-card .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag {
+  display: inline-block;
+  background: var(--icon-bg);
+  border: 0.5px solid var(--icon-border);
+  color: var(--badge-color);
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.condition-card .card-actions {
+  float: right;
+  display: flex;
+  gap: 8px;
+}
+.condition-card .edit-btn,
+.condition-card .delete-btn {
+  background: none;
+  border: none;
+  color: var(--sub);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.condition-card .edit-btn:hover { color: #F59E0B; }
+.condition-card .delete-btn:hover { color: #ef4444; }
+
+.empty {
+  text-align: center;
+  padding: 40px 0;
+  color: var(--empty-color);
+  font-size: 14px;
+}
+
+/* ── 조건 추가 모달 ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 100;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg);
+  border-radius: 20px 20px 0 0;
+  padding: 28px 24px 32px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.modal h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.modal .field { margin-bottom: 14px; }
+.modal .field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.modal .field input,
+.modal .field select {
+  width: 100%;
+  padding: 12px 13px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  outline: none;
+}
+.modal .field input:focus,
+.modal .field select:focus { border-color: var(--input-focus); }
+
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 400;
+  padding: 7px 11px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.checkbox-group label:has(input:checked) {
+  border-color: #F59E0B;
+  background: var(--icon-bg);
+}
+.checkbox-group input[type="checkbox"] {
+  width: 15px; height: 15px;
+  accent-color: #F59E0B;
+}
+.cb-divider {
+  width: 100%;
+  height: 0;
+  margin: 2px 0;
+}
+.modal-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.modal-btns button {
+  flex: 1;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 11px;
+  cursor: pointer;
+  border: none;
+}
+.btn-cancel {
+  background: var(--card);
+  color: var(--sub);
+  border: 0.5px solid var(--border) !important;
+}
+.btn-save {
+  background: #F59E0B;
+  color: #fff;
+}
+
+/* ── 계정 설정 섹션 ── */
+.account-section {
+  margin: 0 20px;
+  padding: 18px 20px;
+  background: var(--card);
+  border: 0.5px solid var(--border);
+  border-radius: 14px;
+}
+.account-section .section-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.btn-dormant {
+  background: var(--input-bg);
+  color: var(--sub);
+  border: 1px solid var(--input-border);
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.btn-dormant:hover { border-color: #F59E0B; color: var(--text); }
+.btn-withdraw {
+  background: none;
+  color: #ef4444;
+  border: 1px solid rgba(239,68,68,0.3);
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.btn-withdraw:hover { border-color: #ef4444; background: rgba(239,68,68,0.05); }
+
+.footer {
+  padding: 24px 24px 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--footer-color);
+}
+
+/* ── 토스트 메시지 ── */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.toast.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-logo">농지<em>알리미</em></a>
+  <button class="header-login" id="logoutBtn">로그아웃</button>
+</header>
+
+<!-- 사용자 정보 -->
+<div class="user-card" id="userCard">
+  <div class="greeting">안녕하세요, <span id="userName">...</span>님</div>
+  <div class="user-meta">
+    <span id="userEmail">...</span>
+    <span class="plan-badge" id="userPlan">free</span>
+  </div>
+</div>
+
+<!-- 알림 조건 목록 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">알림 조건</div>
+    <button class="add-btn" id="addBtn">+ 조건 추가</button>
+  </div>
+  <div id="conditionList">
+    <div class="empty">로딩 중...</div>
+  </div>
+</div>
+
+<!-- 조건 추가 모달 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2>알림 조건 추가</h2>
+    <form id="conditionForm">
+      <div class="field">
+        <label for="cLabel">라벨</label>
+        <input type="text" id="cLabel" placeholder="예: 전남 임야 매매">
+      </div>
+      <div class="field">
+        <label>거래유형 *</label>
+        <div class="checkbox-group" id="cBizType">
+          <label><input type="checkbox" value="D1"> 매도-맞춤형</label>
+          <label><input type="checkbox" value="A1"> 매도-수탁</label>
+          <label><input type="checkbox" value="B1"> 매도-공공임대</label>
+          <label><input type="checkbox" value="C1"> 매도-경영회생</label>
+          <div class="cb-divider"></div>
+          <label><input type="checkbox" value="D2"> 임대-맞춤형</label>
+          <label><input type="checkbox" value="A2"> 임대-수탁</label>
+          <label><input type="checkbox" value="B2"> 임대-공공임대</label>
+          <label><input type="checkbox" value="C2"> 임대-경영회생</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>지역 선택</label>
+        <select id="cSido" style="margin-bottom:8px">
+          <option value="">시도 선택</option>
+        </select>
+        <select id="cSigun" style="margin-bottom:8px" disabled>
+          <option value="">시군구 선택</option>
+        </select>
+        <select id="cEupmyeon" disabled>
+          <option value="">읍면동 선택 (선택사항)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cLandCategory">지목</label>
+        <select id="cLandCategory">
+          <option value="">전체</option>
+          <option value="전">전</option>
+          <option value="답">답</option>
+          <option value="과수원">과수원</option>
+          <option value="임야">임야</option>
+          <option value="목장용지">목장용지</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cAreaMin">최소 면적 (m²)</label>
+        <input type="number" id="cAreaMin" placeholder="예: 1000">
+      </div>
+      <div class="field">
+        <label for="cAreaMax">최대 면적 (m²)</label>
+        <input type="number" id="cAreaMax" placeholder="예: 10000">
+      </div>
+      <div class="field">
+        <label for="cPriceMax">최대 가격 (원)</label>
+        <input type="number" id="cPriceMax" placeholder="예: 500000000">
+      </div>
+      <div class="modal-btns">
+        <button type="button" class="btn-cancel" id="cancelBtn">취소</button>
+        <button type="submit" class="btn-save">저장</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 계정 설정 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">계정 설정</div>
+  </div>
+  <div class="account-section">
+    <div class="account-actions">
+      <button class="btn-dormant" id="dormantBtn">계정 휴면</button>
+      <button class="btn-withdraw" id="withdrawBtn">회원 탈퇴</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">&copy; 2025 농지알리미</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API = 'http://127.0.0.1:8000';
+var token = localStorage.getItem('token');
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function() {
+    toast.classList.remove('show');
+  }, 2000);
+}
+
+if (!token) {
+  location.href = 'login.html';
+}
+
+function authHeaders() {
+  return { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+}
+
+// ── 사용자 정보 로드 ──
+async function loadUser() {
+  try {
+    var res = await fetch(API + '/auth/me', { headers: authHeaders() });
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      showToast('세션이 만료되었습니다');
+      setTimeout(function() { location.href = 'login.html?expired=1'; }, 2000);
+      return;
+    }
+
+    var contentType = res.headers.get('content-type');
+    var user;
+    if (contentType && contentType.includes('application/json')) {
+      user = await res.json();
+    } else {
+      throw new Error('서버 오류가 발생했습니다');
+    }
+
+    document.getElementById('userName').textContent = user.nickname || user.email.split('@')[0];
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('userPlan').textContent = user.plan;
+  } catch (e) {
+    document.getElementById('userName').textContent = '사용자';
+  }
+}
+
+// ── 알림 조건 목록 로드 ──
+async function loadConditions() {
+  var list = document.getElementById('conditionList');
+  try {
+    var res = await fetch(API + '/conditions', { headers: authHeaders() });
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      showToast('세션이 만료되었습니다');
+      setTimeout(function() { location.href = 'login.html?expired=1'; }, 2000);
+      return;
+    }
+
+    var contentType = res.headers.get('content-type');
+    var conditions;
+    if (contentType && contentType.includes('application/json')) {
+      conditions = await res.json();
+    } else {
+      throw new Error('서버 오류가 발생했습니다');
+    }
+
+    if (conditions.length === 0) {
+      list.innerHTML = '<div class="empty">등록된 알림 조건이 없습니다.<br>조건을 추가해보세요!</div>';
+      return;
+    }
+
+    // 조건 데이터를 전역에 저장 (수정 시 사용)
+    window._conditionsCache = {};
+    conditions.forEach(function(c) { window._conditionsCache[c.id] = c; });
+
+    list.innerHTML = conditions.map(function(c) {
+      var tags = [];
+      if (c.biz_type && c.biz_type.length > 0) {
+        c.biz_type.forEach(function(code) { tags.push(BIZ_LABELS[code] || code); });
+      } else if (c.trade_type) {
+        tags.push(c.trade_type);
+      }
+      if (c.land_category) tags.push(c.land_category);
+      if (c.area_min || c.area_max) {
+        var area = (c.area_min || '?') + '~' + (c.area_max || '?') + 'm²';
+        tags.push(area);
+      }
+      if (c.price_max) tags.push(Math.round(c.price_max / 10000).toLocaleString() + '만원 이하');
+
+      return '<div class="condition-card">'
+        + '<div class="card-actions">'
+        + '<button class="edit-btn" data-id="' + escapeHtml(c.id) + '">수정</button>'
+        + '<button class="delete-btn" data-id="' + escapeHtml(c.id) + '">삭제</button>'
+        + '</div>'
+        + '<div class="label">' + escapeHtml(c.label || '조건 ' + c.id.slice(0, 8)) + '</div>'
+        + '<div class="tags">' + tags.map(function(t) { return '<span class="tag">' + escapeHtml(t) + '</span>'; }).join('') + '</div>'
+        + '</div>';
+    }).join('');
+
+    // 수정 버튼 이벤트
+    list.querySelectorAll('.edit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        openEditModal(btn.dataset.id);
+      });
+    });
+
+    // 삭제 버튼 이벤트
+    list.querySelectorAll('.delete-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        if (!confirm('이 알림 조건을 삭제하시겠습니까?')) return;
+        await fetch(API + '/conditions/' + btn.dataset.id, {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        loadConditions();
+      });
+    });
+  } catch (e) {
+    list.innerHTML = '<div class="empty">조건 목록을 불러올 수 없습니다.</div>';
+  }
+}
+
+// ── 모달 ──
+var modal = document.getElementById('modal');
+var editingConditionId = null;  // null=추가모드, string=수정모드
+
+function openAddModal() {
+  editingConditionId = null;
+  document.querySelector('.modal h2').textContent = '알림 조건 추가';
+  document.querySelector('.btn-save').textContent = '저장';
+  document.getElementById('conditionForm').reset();
+  // 드롭다운 초기화
+  document.getElementById('cSigun').innerHTML = '<option value="">시군구 선택</option>';
+  document.getElementById('cSigun').disabled = true;
+  document.getElementById('cEupmyeon').innerHTML = '<option value="">읍면동 선택 (선택사항)</option>';
+  document.getElementById('cEupmyeon').disabled = true;
+  modal.classList.add('show');
+}
+
+async function openEditModal(conditionId) {
+  editingConditionId = conditionId;
+  var c = window._conditionsCache[conditionId];
+  if (!c) return;
+
+  document.querySelector('.modal h2').textContent = '알림 조건 수정';
+  document.querySelector('.btn-save').textContent = '수정';
+  document.getElementById('conditionForm').reset();
+
+  // 기본 필드 채우기
+  document.getElementById('cLabel').value = c.label || '';
+  document.getElementById('cLandCategory').value = c.land_category || '';
+  document.getElementById('cAreaMin').value = c.area_min || '';
+  document.getElementById('cAreaMax').value = c.area_max || '';
+  document.getElementById('cPriceMax').value = c.price_max || '';
+
+  // biz_type 체크박스 복원
+  document.querySelectorAll('#cBizType input').forEach(function(cb) {
+    cb.checked = c.biz_type && c.biz_type.indexOf(cb.value) !== -1;
+  });
+
+  // 지역 드롭다운 복원
+  var sidoSel = document.getElementById('cSido');
+  var sigunSel = document.getElementById('cSigun');
+  var eupmyeonSel = document.getElementById('cEupmyeon');
+  sigunSel.innerHTML = '<option value="">시군구 선택</option>';
+  sigunSel.disabled = true;
+  eupmyeonSel.innerHTML = '<option value="">읍면동 선택 (선택사항)</option>';
+  eupmyeonSel.disabled = true;
+
+  if (c.region_id) {
+    try {
+      var res = await fetch(API + '/regions/ancestors?region_id=' + encodeURIComponent(c.region_id));
+      if (res.ok) {
+        var anc = await res.json();
+
+        if (anc.sido_id) {
+          sidoSel.value = anc.sido_id;
+
+          // 시군구 로드
+          var sgRes = await fetch(API + '/regions/sigun?sido_id=' + encodeURIComponent(anc.sido_id));
+          if (sgRes.ok) {
+            var sgList = await sgRes.json();
+            sigunSel.innerHTML = '<option value="">시군구 선택</option>';
+            sgList.forEach(function(r) {
+              sigunSel.innerHTML += '<option value="' + escapeHtml(r.id) + '">' + escapeHtml(r.name) + '</option>';
+            });
+            sigunSel.disabled = false;
+            if (anc.sigun_id) {
+              sigunSel.value = anc.sigun_id;
+
+              // 읍면동 로드
+              var emRes = await fetch(API + '/regions/eupmyeon?sigun_id=' + encodeURIComponent(anc.sigun_id));
+              if (emRes.ok) {
+                var emList = await emRes.json();
+                if (emList.length > 0) {
+                  eupmyeonSel.innerHTML = '<option value="">읍면동 선택 (선택사항)</option>';
+                  emList.forEach(function(r) {
+                    eupmyeonSel.innerHTML += '<option value="' + escapeHtml(r.id) + '">' + escapeHtml(r.name) + '</option>';
+                  });
+                  eupmyeonSel.disabled = false;
+                  if (anc.eupmyeon_id) eupmyeonSel.value = anc.eupmyeon_id;
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('지역 조상 로드 실패:', e);
+    }
+  }
+
+  modal.classList.add('show');
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+  editingConditionId = null;
+}
+
+document.getElementById('addBtn').addEventListener('click', openAddModal);
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+modal.addEventListener('click', function(e) { if (e.target === modal) closeModal(); });
+
+// ── 거래유형 코드 → 표시명 ──
+var BIZ_LABELS = {
+  D1: '매도-맞춤형', A1: '매도-수탁', B1: '매도-공공임대', C1: '매도-경영회생',
+  D2: '임대-맞춤형', A2: '임대-수탁', B2: '임대-공공임대', C2: '임대-경영회생'
+};
+
+// ── 지역 드롭다운 ──
+async function loadSido() {
+  try {
+    var res = await fetch(API + '/regions/sido');
+    if (!res.ok) { console.error('sido API 오류:', res.status, await res.text()); return; }
+    var list = await res.json();
+    var sel = document.getElementById('cSido');
+    sel.innerHTML = '<option value="">시도 선택</option>';
+    list.forEach(function(r) {
+      sel.innerHTML += '<option value="' + escapeHtml(r.id) + '">' + escapeHtml(r.name) + '</option>';
+    });
+    console.log('시도 로드 완료:', list.length, '건');
+  } catch (e) { console.error('sido 로드 실패:', e); }
+}
+
+document.getElementById('cSido').addEventListener('change', async function() {
+  var sigunSel = document.getElementById('cSigun');
+  var eupmyeonSel = document.getElementById('cEupmyeon');
+  sigunSel.innerHTML = '<option value="">시군구 선택</option>';
+  sigunSel.disabled = true;
+  eupmyeonSel.innerHTML = '<option value="">읍면동 선택 (선택사항)</option>';
+  eupmyeonSel.disabled = true;
+
+  if (!this.value) return;
+  try {
+    var url = API + '/regions/sigun?sido_id=' + encodeURIComponent(this.value);
+    console.log('시군구 요청:', url);
+    var res = await fetch(url);
+    if (!res.ok) { console.error('sigun API 오류:', res.status, await res.text()); return; }
+    var list = await res.json();
+    console.log('시군구 응답:', list.length, '건');
+    list.forEach(function(r) {
+      sigunSel.innerHTML += '<option value="' + escapeHtml(r.id) + '">' + escapeHtml(r.name) + '</option>';
+    });
+    sigunSel.disabled = false;
+  } catch (e) { console.error('sigun 로드 실패:', e); }
+});
+
+document.getElementById('cSigun').addEventListener('change', async function() {
+  var eupmyeonSel = document.getElementById('cEupmyeon');
+  eupmyeonSel.innerHTML = '<option value="">읍면동 선택 (선택사항)</option>';
+  eupmyeonSel.disabled = true;
+
+  if (!this.value) return;
+  try {
+    var url = API + '/regions/eupmyeon?sigun_id=' + encodeURIComponent(this.value);
+    var res = await fetch(url);
+    if (!res.ok) { console.error('eupmyeon API 오류:', res.status, await res.text()); return; }
+    var list = await res.json();
+    if (list.length > 0) {
+      list.forEach(function(r) {
+        eupmyeonSel.innerHTML += '<option value="' + escapeHtml(r.id) + '">' + escapeHtml(r.name) + '</option>';
+      });
+      eupmyeonSel.disabled = false;
+    }
+  } catch (e) { console.error('eupmyeon 로드 실패:', e); }
+});
+
+loadSido();
+
+// ── 조건 추가/수정 ──
+document.getElementById('conditionForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  var checked = Array.from(document.querySelectorAll('#cBizType input:checked')).map(function(cb) { return cb.value; });
+  if (checked.length === 0) {
+    alert('거래유형을 1개 이상 선택해주세요');
+    return;
+  }
+
+  var body = { biz_type: checked };
+  var label = document.getElementById('cLabel').value.trim();
+  var landCat = document.getElementById('cLandCategory').value;
+  var areaMin = document.getElementById('cAreaMin').value;
+  var areaMax = document.getElementById('cAreaMax').value;
+  var priceMax = document.getElementById('cPriceMax').value;
+
+  // 면적 범위 검증
+  if (areaMin && areaMax) {
+    var min = parseInt(areaMin);
+    var max = parseInt(areaMax);
+    if (min > max) {
+      alert('최소 면적이 최대 면적보다 클 수 없습니다');
+      return;
+    }
+  }
+
+  // 지역: 읍면동 > 시군구 > 시도 순으로 가장 구체적인 region_id 사용
+  var regionId = document.getElementById('cEupmyeon').value
+    || document.getElementById('cSigun').value
+    || document.getElementById('cSido').value;
+  if (regionId) body.region_id = regionId;
+
+  if (label) body.label = label;
+  if (landCat) body.land_category = landCat;
+  if (areaMin) body.area_min = parseInt(areaMin);
+  if (areaMax) body.area_max = parseInt(areaMax);
+  if (priceMax) body.price_max = parseInt(priceMax);
+
+  var isEdit = !!editingConditionId;
+  var url = isEdit ? API + '/conditions/' + editingConditionId : API + '/conditions';
+  var method = isEdit ? 'PUT' : 'POST';
+
+  var submitBtn = document.querySelector('.btn-save');
+  var originalText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = '처리 중...';
+
+  try {
+    var res = await fetch(url, {
+      method: method,
+      headers: authHeaders(),
+      body: JSON.stringify(body)
+    });
+
+    var contentType = res.headers.get('content-type');
+    var data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await res.json();
+    } else if (!res.ok) {
+      throw new Error('서버 오류가 발생했습니다');
+    }
+
+    if (!res.ok) {
+      alert(data.detail || (isEdit ? '조건 수정에 실패했습니다' : '조건 추가에 실패했습니다'));
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      return;
+    }
+    closeModal();
+    document.getElementById('conditionForm').reset();
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+    loadConditions();
+  } catch (e) {
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+      alert('네트워크 연결을 확인해주세요');
+    } else {
+      alert(e.message);
+    }
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+  }
+});
+
+// ── 계정 휴면 ──
+document.getElementById('dormantBtn').addEventListener('click', async function() {
+  if (!confirm('계정을 휴면 처리하시겠습니까?\n휴면 중에는 알림이 발송되지 않으며, 재로그인 시 복구됩니다.')) return;
+  try {
+    var res = await fetch(API + '/auth/me/deactivate', { method: 'PATCH', headers: authHeaders() });
+
+    var contentType = res.headers.get('content-type');
+    var data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await res.json();
+    }
+
+    if (!res.ok) { alert(data?.detail || '휴면 처리 실패'); return; }
+    alert('계정이 휴면 처리되었습니다.');
+    localStorage.removeItem('token');
+    location.href = 'index.html';
+  } catch (e) {
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+      alert('네트워크 연결을 확인해주세요');
+    } else {
+      alert('서버 연결에 실패했습니다');
+    }
+  }
+});
+
+// ── 회원 탈퇴 ──
+document.getElementById('withdrawBtn').addEventListener('click', async function() {
+  if (!confirm('정말 탈퇴하시겠습니까?\n탈퇴 후 개인정보는 즉시 삭제되며, 복구할 수 없습니다.')) return;
+  if (!confirm('마지막 확인입니다. 탈퇴를 진행할까요?')) return;
+  try {
+    var res = await fetch(API + '/auth/me', { method: 'DELETE', headers: authHeaders() });
+
+    var contentType = res.headers.get('content-type');
+    var data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await res.json();
+    }
+
+    if (!res.ok) { alert(data?.detail || '탈퇴 처리 실패'); return; }
+    alert('탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
+    localStorage.removeItem('token');
+    location.href = 'index.html';
+  } catch (e) {
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+      alert('네트워크 연결을 확인해주세요');
+    } else {
+      alert('서버 연결에 실패했습니다');
+    }
+  }
+});
+
+// ── 로그아웃 ──
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  localStorage.removeItem('token');
+  location.href = 'index.html';
+});
+
+// ── 초기 로드 ──
+loadUser();
+loadConditions();
+</script>
+</body>
+</html>

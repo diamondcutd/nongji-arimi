@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>로그인 — 농지알리미</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:           #F7F7F8;
+  --card:         #FFFFFF;
+  --text:         #202123;
+  --sub:          #6b7280;
+  --border:       rgba(0,0,0,0.08);
+  --header-bd:    rgba(0,0,0,0.07);
+  --hbtn-color:   #202123;
+  --hbtn-border:  rgba(0,0,0,0.18);
+  --input-bg:     #FFFFFF;
+  --input-border: rgba(0,0,0,0.15);
+  --input-focus:  #F59E0B;
+  --footer-color: #b0b0b0;
+  --error-color:  #ef4444;
+  --error-bg:     #fef2f2;
+  --success-color:#16a34a;
+  --success-bg:   #f0fdf4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:           #202123;
+    --card:         #2A2B32;
+    --text:         #FFFFFF;
+    --sub:          #B4B7C1;
+    --border:       rgba(255,255,255,0.07);
+    --header-bd:    rgba(255,255,255,0.07);
+    --hbtn-color:   #B4B7C1;
+    --hbtn-border:  rgba(255,255,255,0.15);
+    --input-bg:     #2A2B32;
+    --input-border: rgba(255,255,255,0.15);
+    --input-focus:  #F59E0B;
+    --footer-color: #4a4b52;
+    --error-color:  #fca5a5;
+    --error-bg:     rgba(239,68,68,0.1);
+    --success-color:#86efac;
+    --success-bg:   rgba(22,163,74,0.1);
+  }
+}
+
+body {
+  font-family: -apple-system, 'Pretendard', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 420px;
+  margin: 0 auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--header-bd);
+}
+.header-logo {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text);
+  text-decoration: none;
+}
+.header-logo em { font-style: normal; color: #F59E0B; }
+.header-login {
+  background: transparent;
+  border: 0.5px solid var(--hbtn-border);
+  color: var(--hbtn-color);
+  padding: 6px 13px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.form-wrap {
+  padding: 48px 24px 32px;
+}
+.form-wrap h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.form-wrap .desc {
+  font-size: 14px;
+  color: var(--sub);
+  margin-bottom: 32px;
+}
+
+.field { margin-bottom: 18px; }
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.field input {
+  width: 100%;
+  padding: 13px 14px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 11px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field input:focus { border-color: var(--input-focus); }
+.field input::placeholder { color: var(--sub); opacity: 0.6; }
+
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  margin-top: 8px;
+  background: #F59E0B;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.msg {
+  margin-top: 14px;
+  padding: 12px 14px;
+  font-size: 13px;
+  border-radius: 10px;
+  display: none;
+}
+.msg.error { background: var(--error-bg); color: var(--error-color); }
+.msg.success { background: var(--success-bg); color: var(--success-color); }
+
+.switch-link {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--sub);
+}
+.switch-link a {
+  color: #F59E0B;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.footer {
+  padding: 24px 24px 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--footer-color);
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="header-logo">농지<em>알리미</em></a>
+  <button class="header-login" onclick="location.href='register.html'">회원가입</button>
+</header>
+
+<div class="form-wrap">
+  <h1>로그인</h1>
+  <p class="desc">이메일과 비밀번호를 입력하세요.</p>
+
+  <div class="msg success" id="successMsg">회원가입이 완료되었습니다. 로그인해주세요!</div>
+  <div class="msg error" id="expiredMsg" style="display:none;background:var(--error-bg);color:var(--error-color)">세션이 만료되었습니다. 다시 로그인해주세요.</div>
+
+  <form id="loginForm">
+    <div class="field">
+      <label for="email">이메일</label>
+      <input type="email" id="email" placeholder="example@email.com" required>
+    </div>
+    <div class="field">
+      <label for="password">비밀번호</label>
+      <input type="password" id="password" placeholder="비밀번호 입력" required>
+    </div>
+    <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
+    <div class="msg error" id="errorMsg"></div>
+  </form>
+
+  <div class="switch-link">
+    계정이 없으신가요? <a href="register.html">회원가입</a>
+  </div>
+</div>
+
+<footer class="footer">&copy; 2025 농지알리미</footer>
+
+<script>
+var API = 'http://127.0.0.1:8000';
+
+// 회원가입 또는 토큰 만료 후 리다이렉트된 경우 메시지 표시
+var params = new URLSearchParams(location.search);
+if (params.get('registered')) {
+  document.getElementById('successMsg').style.display = 'block';
+}
+if (params.get('expired')) {
+  document.getElementById('expiredMsg').style.display = 'block';
+}
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var btn = document.getElementById('submitBtn');
+  var errorMsg = document.getElementById('errorMsg');
+  errorMsg.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = '로그인 중...';
+
+  try {
+    var res = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      })
+    });
+
+    var data;
+    var contentType = res.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      data = await res.json();
+    } else {
+      throw new Error('서버 오류가 발생했습니다');
+    }
+
+    if (!res.ok) {
+      throw new Error(data.detail || '로그인에 실패했습니다');
+    }
+
+    localStorage.setItem('token', data.access_token);
+    location.href = 'dashboard.html';
+  } catch (err) {
+    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+      errorMsg.textContent = '네트워크 연결을 확인해주세요';
+    } else {
+      errorMsg.textContent = err.message;
+    }
+    errorMsg.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '로그인';
+  }
+});
+</script>
+</body>
+</html>
