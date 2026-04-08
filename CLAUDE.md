@@ -154,7 +154,7 @@ Python 3.14 + FastAPI, Playwright + BeautifulSoup, APScheduler, PostgreSQL 17, p
 - **크롤러 100건 제한 해결**: `scraper.py` — 시도별 총 건수 확인 후 ≥100이면 시군구별 분할 크롤링. `_build_url()`에 `sigun_cd` 파라미터 추가, `_parse_page_listings()` 헬퍼 분리
 
 ### 미완료 / 확인 필요
-- (없음 — 오늘 작업 전부 완료)
+- (없음)
 
 ## 2026-04-07 추가 작업 이력
 
@@ -176,3 +176,20 @@ Python 3.14 + FastAPI, Playwright + BeautifulSoup, APScheduler, PostgreSQL 17, p
   - 카카오 콘솔: 리다이렉트 URI 등록, 활성화 ON, Client Secret 활성화 확인
   - 로그인 → 동의 → 대시보드 진입까지 전체 플로우 테스트 완료
   - 남은 작업: 동의항목에서 닉네임 필수 설정 (현재 '사용자님'으로 표시)
+
+## 2026-04-08 작업 이력
+
+### 완료
+- **`.env.example` 수정**: `KAKAO_CLIENT_SECRET` 누락 항목 추가
+- **`index.html` CTA 버튼 수정**: `register.html` → `login.html`로 변경 (카카오 로그인 단일 전환 반영)
+- **`register.html` 리다이렉트**: 이메일/비밀번호 회원가입 폼 제거, `login.html`로 자동 리다이렉트 페이지로 교체 (기존 북마크/직접 접속 대응)
+- **`matcher.py` 예외 처리 추가**: `run_matcher()`를 `try/except`로 감싸고 `_run_matcher_impl()`로 분리. 매칭 엔진 크래시 시 로그 기록 + 스케줄러 중단 방지
+- **`expire_stale.py` 삭제**: 일회성 DB 정리 스크립트 제거 (동일 로직은 `crawler/db.py`의 `expire_unseen_listings()`에 상시 구현됨)
+- **커밋 정리**: 미커밋 12개 파일을 2개 논리 단위로 분할 커밋 후 push 완료
+  - `999dea3`: UI 테마 + 크롤러 + 매물 만료 + matcher 예외 처리
+  - `533235c`: 카카오 OAuth 로그인 + register.html 리다이렉트
+
+### 미완료 / 확인 필요
+- **카카오 닉네임 필수 설정**: 카카오 개발자 콘솔 동의항목에서 닉네임을 필수로 변경 (코드 변경 불필요, 콘솔 작업)
+- **크롤링 시간 최적화**: REQUEST_DELAY=2초 조정 검토 (fbo.or.kr 부하 테스트 필요, 별도 세션)
+- **배포 준비**: 실 서비스 도메인 CORS 설정, 서버 배포
