@@ -1,17 +1,24 @@
 import os
 import uuid
+import httpx
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
 import psycopg2
 import psycopg2.extras
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 
-from app.schemas import UserCreate, LoginRequest, UserResponse, Token
-from app.auth_utils import hash_password, verify_password, create_access_token, get_current_user
+from app.schemas import UserResponse, Token
+from app.auth_utils import create_access_token, get_current_user
 
 router = APIRouter()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost:5432/nongji")
+DATABASE_URL   = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost:5432/nongji")
+KAKAO_REST_KEY    = os.getenv("KAKAO_REST_API_KEY", "")
+KAKAO_CLIENT_SECRET = os.getenv("KAKAO_CLIENT_SECRET", "")
+KAKAO_REDIRECT    = os.getenv("KAKAO_REDIRECT_URI", "http://localhost:8000/auth/kakao/callback")
+FRONTEND_URL      = os.getenv("FRONTEND_URL", "http://localhost:8000")
 
 
 def get_conn():
@@ -22,66 +29,104 @@ def get_conn():
         conn.close()
 
 
-@router.post("/register", response_model=UserResponse, status_code=201)
-def register(data: UserCreate, conn=Depends(get_conn)):
+# ── 카카오 로그인 ──────────────────────────────────────────────────────────────
+
+@router.get("/kakao/login")
+def kakao_login():
+    """카카오 인가 URL로 리다이렉트"""
+    if not KAKAO_REST_KEY:
+        raise HTTPException(status_code=500, detail="KAKAO_REST_API_KEY 환경변수가 설정되지 않았습니다")
+    params = urlencode({
+        "client_id":     KAKAO_REST_KEY,
+        "redirect_uri":  KAKAO_REDIRECT,
+        "response_type": "code",
+    })
+    return RedirectResponse(f"https://kauth.kakao.com/oauth/authorize?{params}")
+
+
+@router.get("/kakao/callback")
+async def kakao_callback(code: str, conn=Depends(get_conn)):
+    """카카오 인가 코드 → 액세스 토큰 → 사용자 정보 → JWT 발급"""
+    # 1) 인가 코드 → 액세스 토큰
+    async with httpx.AsyncClient() as client:
+        token_res = await client.post(
+            "https://kauth.kakao.com/oauth/token",
+            data={
+                "grant_type":    "authorization_code",
+                "client_id":     KAKAO_REST_KEY,
+                "client_secret": KAKAO_CLIENT_SECRET,
+                "redirect_uri":  KAKAO_REDIRECT,
+                "code":          code,
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        if token_res.status_code != 200:
+            import logging
+            logging.getLogger(__name__).error("카카오 토큰 실패: %s %s", token_res.status_code, token_res.text)
+            raise HTTPException(status_code=400, detail=f"카카오 토큰 발급 실패: {token_res.text}")
+        access_token = token_res.json()["access_token"]
+
+        # 2) 액세스 토큰 → 사용자 정보
+        user_res = await client.get(
+            "https://kapi.kakao.com/v2/user/me",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+        if user_res.status_code != 200:
+            raise HTTPException(status_code=400, detail="카카오 사용자 정보 조회 실패")
+        kakao_data = user_res.json()
+
+    kakao_id = str(kakao_data["id"])
+    kakao_account = kakao_data.get("kakao_account", {})
+    nickname = (
+        kakao_account.get("profile", {}).get("nickname")
+        or kakao_data.get("properties", {}).get("nickname")
+    )
+    email = kakao_account.get("email")  # 선택 동의 — 없을 수 있음
+
+    # 3) DB upsert (kakao_id 기준)
     cur = conn.cursor()
     try:
-        # 이메일 중복 확인
-        cur.execute("SELECT id FROM users WHERE email = %s", (data.email,))
-        if cur.fetchone():
-            raise HTTPException(status_code=400, detail="이미 등록된 이메일입니다")
-
-        # INSERT — 실제 users 테이블 컬럼에 맞춤
-        user_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
 
-        cur.execute(
-            """
-            INSERT INTO users (id, email, password_hash, nickname, phone, plan, is_active, created_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id, email, nickname, phone, plan, is_active, created_at
-            """,
-            (user_id, data.email, hash_password(data.password), data.nickname, data.phone, "free", True, now),
-        )
-        user = cur.fetchone()
-        conn.commit()
-        return user
+        # 기존 사용자 확인
+        cur.execute("SELECT id FROM users WHERE kakao_id = %s", (kakao_id,))
+        row = cur.fetchone()
 
-    except HTTPException:
-        raise
+        if row:
+            # 기존 사용자 — last_login 갱신, 닉네임/이메일 최신화
+            user_id = str(row["id"])
+            cur.execute(
+                """
+                UPDATE users
+                SET last_login = %s,
+                    nickname   = COALESCE(%s, nickname),
+                    email      = COALESCE(%s, email),
+                    is_active  = TRUE
+                WHERE kakao_id = %s
+                """,
+                (now, nickname, email, kakao_id),
+            )
+        else:
+            # 신규 사용자
+            user_id = str(uuid.uuid4())
+            cur.execute(
+                """
+                INSERT INTO users (id, kakao_id, email, nickname, plan, is_active, created_at, last_login)
+                VALUES (%s, %s, %s, %s, 'free', TRUE, %s, %s)
+                """,
+                (user_id, kakao_id, email, nickname, now, now),
+            )
+
+        conn.commit()
     except Exception as e:
         conn.rollback()
-        raise HTTPException(status_code=500, detail=f"회원가입 처리 중 오류: {e}")
+        raise HTTPException(status_code=500, detail=f"사용자 처리 중 오류: {e}")
     finally:
         cur.close()
 
-
-@router.post("/login", response_model=Token)
-def login(data: LoginRequest, conn=Depends(get_conn)):
-    cur = conn.cursor()
-    try:
-        cur.execute(
-            "SELECT id, password_hash FROM users WHERE email = %s AND is_active = true",
-            (data.email,),
-        )
-        user = cur.fetchone()
-
-        if not user or not verify_password(data.password, user["password_hash"]):
-            raise HTTPException(status_code=401, detail="이메일 또는 비밀번호가 올바르지 않습니다")
-
-        # last_login 갱신
-        cur.execute("UPDATE users SET last_login = %s WHERE id = %s", (datetime.now(timezone.utc), user["id"]))
-        conn.commit()
-
-        return Token(access_token=create_access_token(str(user["id"])))
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=f"로그인 처리 중 오류: {e}")
-    finally:
-        cur.close()
+    # 4) JWT 발급 → 프론트엔드로 리다이렉트
+    jwt_token = create_access_token(user_id)
+    return RedirectResponse(f"{FRONTEND_URL}/dashboard?token={jwt_token}")
 
 
 @router.get("/me", response_model=UserResponse)

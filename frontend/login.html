@@ -4,64 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>로그인 — 농지알리미</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg:           #F7F7F8;
-  --card:         #FFFFFF;
-  --text:         #202123;
-  --sub:          #6b7280;
-  --border:       rgba(0,0,0,0.08);
-  --header-bd:    rgba(0,0,0,0.07);
-  --hbtn-color:   #202123;
-  --hbtn-border:  rgba(0,0,0,0.18);
-  --input-bg:     #FFFFFF;
-  --input-border: rgba(0,0,0,0.15);
-  --input-focus:  #F59E0B;
-  --footer-color: #b0b0b0;
-  --error-color:  #ef4444;
-  --error-bg:     #fef2f2;
-  --success-color:#16a34a;
-  --success-bg:   #f0fdf4;
+  --green:        #10B981;
+  --green-dark:   #059669;
+  --green-bg:     #ECFDF5;
+  --bg:           #FFFFFF;
+  --text:         #111827;
+  --sub:          #6B7280;
+  --border:       #F3F4F6;
+  --footer-color: #9CA3AF;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:           #202123;
-    --card:         #2A2B32;
-    --text:         #FFFFFF;
-    --sub:          #B4B7C1;
-    --border:       rgba(255,255,255,0.07);
-    --header-bd:    rgba(255,255,255,0.07);
-    --hbtn-color:   #B4B7C1;
-    --hbtn-border:  rgba(255,255,255,0.15);
-    --input-bg:     #2A2B32;
-    --input-border: rgba(255,255,255,0.15);
-    --input-focus:  #F59E0B;
-    --footer-color: #4a4b52;
-    --error-color:  #fca5a5;
-    --error-bg:     rgba(239,68,68,0.1);
-    --success-color:#86efac;
-    --success-bg:   rgba(22,163,74,0.1);
+    --green:        #34D399;
+    --green-dark:   #10B981;
+    --green-bg:     rgba(52,211,153,0.1);
+    --bg:           #111827;
+    --text:         #F9FAFB;
+    --sub:          #9CA3AF;
+    --border:       #374151;
+    --footer-color: #4B5563;
   }
 }
 
 body {
-  font-family: -apple-system, 'Pretendard', sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   max-width: 420px;
   margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
   -webkit-font-smoothing: antialiased;
 }
 
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 0.5px solid var(--header-bd);
+  border-bottom: 1px solid var(--border);
 }
 .header-logo {
   font-size: 17px;
@@ -70,97 +58,82 @@ body {
   color: var(--text);
   text-decoration: none;
 }
-.header-logo em { font-style: normal; color: #F59E0B; }
-.header-login {
-  background: transparent;
-  border: 0.5px solid var(--hbtn-border);
-  color: var(--hbtn-color);
-  padding: 6px 13px;
-  font-size: 12px;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: inherit;
+.header-logo em { font-style: normal; color: var(--green); }
+
+.wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 32px 48px;
 }
 
-.form-wrap {
-  padding: 48px 24px 32px;
+.logo-mark {
+  width: 56px;
+  height: 56px;
+  background: var(--green-bg);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 28px;
 }
-.form-wrap h1 {
-  font-size: 24px;
+
+h1 {
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -0.5px;
-  margin-bottom: 8px;
+  letter-spacing: -0.6px;
+  line-height: 1.3;
+  margin-bottom: 10px;
 }
-.form-wrap .desc {
+
+.desc {
   font-size: 14px;
   color: var(--sub);
-  margin-bottom: 32px;
+  line-height: 1.6;
+  margin-bottom: 40px;
 }
 
-.field { margin-bottom: 18px; }
-.field label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--text);
-}
-.field input {
-  width: 100%;
-  padding: 13px 14px;
-  font-size: 15px;
-  font-family: inherit;
-  background: var(--input-bg);
-  color: var(--text);
-  border: 1px solid var(--input-border);
-  border-radius: 11px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.field input:focus { border-color: var(--input-focus); }
-.field input::placeholder { color: var(--sub); opacity: 0.6; }
-
-.submit-btn {
+.kakao-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   width: 100%;
   padding: 15px;
-  margin-top: 8px;
-  background: #F59E0B;
-  color: #fff;
+  background: #FEE500;
+  color: #191919;
   font-size: 16px;
   font-weight: 700;
   font-family: inherit;
   border: none;
   border-radius: 13px;
   cursor: pointer;
-  transition: opacity 0.2s;
-}
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.msg {
-  margin-top: 14px;
-  padding: 12px 14px;
-  font-size: 13px;
-  border-radius: 10px;
-  display: none;
-}
-.msg.error { background: var(--error-bg); color: var(--error-color); }
-.msg.success { background: var(--success-bg); color: var(--success-color); }
-
-.switch-link {
-  text-align: center;
-  margin-top: 24px;
-  font-size: 13px;
-  color: var(--sub);
-}
-.switch-link a {
-  color: #F59E0B;
-  font-weight: 600;
   text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: -0.3px;
 }
+.kakao-btn:hover  { background: #F5DC00; }
+.kakao-btn:active { transform: scale(0.98); }
+
+.kakao-btn svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.notice {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--sub);
+  text-align: center;
+  line-height: 1.6;
+}
+.notice.error { color: #ef4444; }
 
 .footer {
-  padding: 24px 24px 32px;
+  padding: 24px;
   text-align: center;
   font-size: 12px;
   color: var(--footer-color);
@@ -171,91 +144,42 @@ body {
 
 <header class="header">
   <a href="index.html" class="header-logo">농지<em>알리미</em></a>
-  <button class="header-login" onclick="location.href='register.html'">회원가입</button>
 </header>
 
-<div class="form-wrap">
-  <h1>로그인</h1>
-  <p class="desc">이메일과 비밀번호를 입력하세요.</p>
+<div class="wrap">
+  <div class="logo-mark">🌾</div>
 
-  <div class="msg success" id="successMsg">회원가입이 완료되었습니다. 로그인해주세요!</div>
-  <div class="msg error" id="expiredMsg" style="display:none;background:var(--error-bg);color:var(--error-color)">세션이 만료되었습니다. 다시 로그인해주세요.</div>
+  <h1>농지 매물 알림,<br>이제 놓치지 마세요</h1>
+  <p class="desc">카카오 계정으로 간편하게 시작하세요.<br>로그인과 동시에 회원가입이 완료됩니다.</p>
 
-  <form id="loginForm">
-    <div class="field">
-      <label for="email">이메일</label>
-      <input type="email" id="email" placeholder="example@email.com" required>
-    </div>
-    <div class="field">
-      <label for="password">비밀번호</label>
-      <input type="password" id="password" placeholder="비밀번호 입력" required>
-    </div>
-    <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
-    <div class="msg error" id="errorMsg"></div>
-  </form>
+  <a class="kakao-btn" id="kakaoBtn" href="/auth/kakao/login">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M12 3C6.477 3 2 6.477 2 10.8c0 2.784 1.734 5.228 4.356 6.65L5.2 21l4.56-2.74c.73.1 1.48.153 2.24.153 5.523 0 10-3.477 10-7.8C22 6.477 17.523 3 12 3z"
+        fill="#191919"/>
+    </svg>
+    카카오로 시작하기
+  </a>
 
-  <div class="switch-link">
-    계정이 없으신가요? <a href="register.html">회원가입</a>
-  </div>
+  <p class="notice" id="notice">로그인 시 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다.</p>
 </div>
 
-<footer class="footer">&copy; 2025 농지알리미</footer>
+<footer class="footer">&copy; 2026 농지알리미</footer>
 
 <script>
-var API = 'http://127.0.0.1:8000';
-
-// 회원가입 또는 토큰 만료 후 리다이렉트된 경우 메시지 표시
+// 에러 파라미터 처리
 var params = new URLSearchParams(location.search);
-if (params.get('registered')) {
-  document.getElementById('successMsg').style.display = 'block';
+if (params.get('error')) {
+  var notice = document.getElementById('notice');
+  notice.className = 'notice error';
+  notice.textContent = '로그인 중 문제가 발생했습니다. 다시 시도해주세요.';
 }
-if (params.get('expired')) {
-  document.getElementById('expiredMsg').style.display = 'block';
-}
 
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  var btn = document.getElementById('submitBtn');
-  var errorMsg = document.getElementById('errorMsg');
-  errorMsg.style.display = 'none';
-  btn.disabled = true;
-  btn.textContent = '로그인 중...';
-
-  try {
-    var res = await fetch(API + '/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: document.getElementById('email').value.trim(),
-        password: document.getElementById('password').value
-      })
-    });
-
-    var data;
-    var contentType = res.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      data = await res.json();
-    } else {
-      throw new Error('서버 오류가 발생했습니다');
-    }
-
-    if (!res.ok) {
-      throw new Error(data.detail || '로그인에 실패했습니다');
-    }
-
-    localStorage.setItem('token', data.access_token);
-    location.href = 'dashboard.html';
-  } catch (err) {
-    if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-      errorMsg.textContent = '네트워크 연결을 확인해주세요';
-    } else {
-      errorMsg.textContent = err.message;
-    }
-    errorMsg.style.display = 'block';
-    btn.disabled = false;
-    btn.textContent = '로그인';
-  }
-});
+// 개발환경(localhost)에서는 API URL 앞에 포트 붙이기
+var API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
+  ? 'http://localhost:8000'
+  : '';
+document.getElementById('kakaoBtn').href = API + '/auth/kakao/login';
 </script>
 </body>
 </html>
