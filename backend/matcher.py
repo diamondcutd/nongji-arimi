@@ -113,20 +113,28 @@ async def fetch_catchup_listings(session, user_id: str, days: int = CATCHUP_DAYS
     today = date.today()
     cutoff_date = today - timedelta(days=days)
     result = await session.execute(text("""
-        SELECT DISTINCT l.id, l.listing_key, l.region_id, l.trade_type, l.biz_type,
+        SELECT DISTINCT ON (l.id)
+               l.id, l.listing_key, l.region_id, l.trade_type, l.biz_type,
                l.land_category, l.address_full, l.parcel_count,
                l.total_area_sqm, l.detail_url, l.first_seen_at,
                ls.price, ls.price_per_sqm, ls.applicant_count, ls.deadline,
                n.sent_at
         FROM notifications n
         JOIN listings l ON l.id = n.listing_id
-        JOIN listing_snapshots ls ON ls.listing_id = l.id AND ls.is_first = TRUE
+        JOIN LATERAL (
+            SELECT price, price_per_sqm, applicant_count, deadline
+            FROM listing_snapshots
+            WHERE listing_id = l.id
+            ORDER BY crawled_at DESC
+            LIMIT 1
+        ) ls ON true
         WHERE n.user_id = CAST(:user_id AS uuid)
           AND n.status = 'sent'
           AND n.sent_at >= :cutoff_date
           AND n.sent_at < :today
           AND l.status = 'active'
-        ORDER BY ls.deadline ASC NULLS LAST, n.sent_at DESC
+          AND (ls.deadline IS NULL OR ls.deadline >= :today)
+        ORDER BY l.id, ls.deadline ASC NULLS LAST, n.sent_at DESC
     """), {"user_id": user_id, "cutoff_date": cutoff_date, "today": today})
     columns = result.keys()
     return [dict(zip(columns, row)) for row in result.fetchall()]
@@ -497,37 +505,50 @@ def _build_card(listing: dict, index: int, is_urgent: bool = False) -> str:
     detail_url = _build_fbo_list_url(listing["address_full"] or "")
     dl_badge = _deadline_badge(listing)
 
+    parcel = listing.get("parcel_count") or 1
+    applicants = listing.get("applicant_count")
+    applicant_html = ""
+    if applicants is not None and applicants > 0:
+        applicant_html = f'<span style="color:#9CA3AF;font-size:11px;margin-left:14px;">신청</span><span style="color:#dc3545;font-size:13px;font-weight:600;"> {applicants}명</span>'
+
     # 마감 임박 카드는 붉은 테두리
-    border = "2px solid #dc3545" if is_urgent else "1px solid #e9ecef"
-    bg = "#fff5f5" if is_urgent else ("#ffffff" if index % 2 == 0 else "#f8faf8")
+    border = "2px solid #dc3545" if is_urgent else "1px solid #F3F4F6"
+    bg = "#fff5f5" if is_urgent else "#FFFFFF"
 
     return f"""
-        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:{bg};border:{border};border-radius:10px;margin-bottom:10px;">
-          <tr><td style="padding:14px 18px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:{bg};border:{border};border-radius:12px;margin-bottom:10px;">
+          <tr><td style="padding:16px 18px;">
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td>
-                  <span style="display:inline-block;background-color:#2d6a4f;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;margin-right:4px;">{biz_label}</span>
-                  <span style="display:inline-block;background-color:#e9ecef;color:#555;font-size:10px;font-weight:600;padding:3px 8px;border-radius:12px;">{land_label}</span>
+                  <span style="display:inline-block;background-color:#059669;color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px;margin-right:4px;">{biz_label}</span>
+                  <span style="display:inline-block;background-color:#F3F4F6;color:#6B7280;font-size:10px;font-weight:600;padding:3px 8px;border-radius:12px;">{land_label}</span>
                   {dl_badge}
                 </td>
                 <td align="right">
-                  <a href="{detail_url}" target="_blank" style="color:#2d6a4f;font-size:12px;font-weight:700;text-decoration:none;">상세보기 &rarr;</a>
+                  <a href="{detail_url}" target="_blank" style="color:#10B981;font-size:12px;font-weight:700;text-decoration:none;">농지은행에서 보기 &rarr;</a>
                 </td>
               </tr>
               <tr>
-                <td colspan="2" style="padding-top:6px;">
-                  <div style="color:#1b4332;font-size:14px;font-weight:700;line-height:1.4;">{location}</div>
+                <td colspan="2" style="padding-top:8px;">
+                  <div style="color:#111827;font-size:14px;font-weight:700;line-height:1.4;">{location}</div>
                 </td>
               </tr>
               <tr>
-                <td colspan="2" style="padding-top:6px;">
-                  <span style="color:#6c757d;font-size:11px;">면적</span>
-                  <span style="color:#333;font-size:13px;font-weight:600;margin-right:14px;"> {_format_area(listing["total_area_sqm"])}</span>
-                  <span style="color:#6c757d;font-size:11px;">가격</span>
-                  <span style="color:#2d6a4f;font-size:13px;font-weight:600;margin-right:14px;"> {_format_price(listing.get("price"))}</span>
-                  <span style="color:#6c757d;font-size:11px;">마감</span>
-                  <span style="color:#333;font-size:13px;font-weight:600;"> {listing.get("deadline") or "-"}</span>
+                <td colspan="2" style="padding-top:8px;">
+                  <span style="color:#9CA3AF;font-size:11px;">면적</span>
+                  <span style="color:#111827;font-size:13px;font-weight:600;"> {_format_area(listing["total_area_sqm"])}</span>
+                  <span style="color:#9CA3AF;font-size:11px;margin-left:14px;">필지</span>
+                  <span style="color:#111827;font-size:13px;font-weight:600;"> {parcel}</span>
+                  <span style="color:#9CA3AF;font-size:11px;margin-left:14px;">가격</span>
+                  <span style="color:#059669;font-size:13px;font-weight:600;"> {_format_price(listing.get("price"))}</span>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" style="padding-top:4px;">
+                  <span style="color:#9CA3AF;font-size:11px;">마감</span>
+                  <span style="color:#111827;font-size:13px;font-weight:600;"> {listing.get("deadline") or "상시"}</span>
+                  {applicant_html}
                 </td>
               </tr>
             </table>
@@ -543,25 +564,25 @@ def _build_section(title: str, emoji: str, listings: list[dict],
     cards = "\n".join(_build_card(l, i, is_urgent) for i, l in enumerate(listings))
     return f"""
     <tr>
-      <td style="padding:16px 24px 4px;">
+      <td style="padding:20px 28px 4px;">
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td>
               <span style="font-size:18px;vertical-align:middle;">{emoji}</span>
               <span style="color:{color};font-size:15px;font-weight:700;vertical-align:middle;margin-left:4px;">{title}</span>
-              <span style="color:#999;font-size:12px;vertical-align:middle;margin-left:8px;">{len(listings)}건</span>
+              <span style="color:#9CA3AF;font-size:12px;vertical-align:middle;margin-left:8px;">{len(listings)}건</span>
             </td>
           </tr>
           <tr>
-            <td style="padding:4px 0 10px;">
-              <span style="color:#888;font-size:11px;">{description}</span>
+            <td style="padding:4px 0 12px;">
+              <span style="color:#9CA3AF;font-size:12px;">{description}</span>
             </td>
           </tr>
         </table>
       </td>
     </tr>
     <tr>
-      <td style="padding:0 24px 8px;">
+      <td style="padding:0 28px 12px;">
         {cards}
       </td>
     </tr>"""
@@ -593,7 +614,7 @@ def build_digest_html(sections: dict[str, list[dict]]) -> str:
         is_urgent=True,
     )
     new_html = _build_section(
-        "오늘 새 매물", "🆕", new, "#2d6a4f",
+        "오늘 새 매물", "🆕", new, "#059669",
         "오늘 새로 올라온 매물이에요.",
     )
     catchup_html = _build_section(
@@ -605,27 +626,26 @@ def build_digest_html(sections: dict[str, list[dict]]) -> str:
 <!DOCTYPE html>
 <html lang="ko">
 <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
-<body style="margin:0;padding:0;background-color:#f5f5f0;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f0;padding:28px 0;">
+<body style="margin:0;padding:0;background-color:#F9FAFB;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F9FAFB;padding:32px 0;">
 <tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+<table width="600" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,0.06);">
 
   <!-- 헤더 -->
   <tr>
-    <td style="background:linear-gradient(135deg,#2d6a4f,#40916c);padding:24px 28px;text-align:center;">
-      <div style="font-size:28px;margin-bottom:4px;">🌾</div>
-      <h1 style="margin:0;color:#ffffff;font-size:18px;font-weight:700;">농지알리미</h1>
-      <p style="margin:4px 0 0;color:#b7e4c7;font-size:12px;">{now_str}</p>
+    <td style="padding:28px 28px 24px;text-align:center;border-bottom:1px solid #F3F4F6;">
+      <h1 style="margin:0;color:#111827;font-size:18px;font-weight:700;letter-spacing:-0.4px;">농지<span style="color:#10B981;">알리미</span></h1>
+      <p style="margin:6px 0 0;color:#9CA3AF;font-size:12px;">{now_str}</p>
     </td>
   </tr>
 
-  <!-- 요약 배너 — 손실 회피 + 자이가르닉 효과 -->
+  <!-- 요약 배너 -->
   <tr>
-    <td style="padding:16px 24px 4px;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#d8f3dc;border-radius:10px;">
-        <tr><td style="padding:12px 16px;text-align:center;">
-          <span style="color:#1b4332;font-size:14px;font-weight:700;">총 {total}건</span>
-          <span style="color:#52796f;font-size:12px;margin-left:6px;">{summary_text}</span>
+    <td style="padding:20px 28px 4px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#ECFDF5;border-radius:12px;">
+        <tr><td style="padding:14px 18px;text-align:center;">
+          <span style="color:#059669;font-size:14px;font-weight:700;">총 {total}건</span>
+          <span style="color:#6B7280;font-size:12px;margin-left:8px;">{summary_text}</span>
         </td></tr>
       </table>
     </td>
@@ -638,9 +658,9 @@ def build_digest_html(sections: dict[str, list[dict]]) -> str:
 
   <!-- 푸터 -->
   <tr>
-    <td style="padding:16px 24px 20px;text-align:center;border-top:1px solid #eee;">
-      <p style="margin:0 0 8px;color:#999;font-size:11px;">조건을 변경하려면 대시보드에서 수정해주세요.</p>
-      <p style="margin:0;color:#bbb;font-size:10px;">&copy; 2026 농지알리미 &middot; 이 메일은 자동 발송되었습니다.</p>
+    <td style="padding:20px 28px 24px;text-align:center;border-top:1px solid #F3F4F6;">
+      <p style="margin:0 0 8px;color:#9CA3AF;font-size:11px;">조건을 변경하려면 대시보드에서 수정해주세요.</p>
+      <p style="margin:0;color:#D1D5DB;font-size:10px;">&copy; 2026 농지알리미 &middot; 이 메일은 자동 발송되었습니다.</p>
     </td>
   </tr>
 
@@ -690,6 +710,13 @@ def send_digest_email(to_email: str, sections: dict[str, list[dict]]) -> bool:
 
 async def run_matcher():
     """신규 매물 매칭 + 누적 매물 수집 → 3섹션 다이제스트 발송."""
+    try:
+        await _run_matcher_impl()
+    except Exception:
+        logger.exception("매칭 엔진 실행 중 오류 발생")
+
+
+async def _run_matcher_impl():
     async with async_session() as session:
         # 1) 신규 매물 조회
         new_listings = await fetch_new_listings(session)

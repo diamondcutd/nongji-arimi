@@ -2,6 +2,22 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Bash(py *)",
+      "Bash(python *)",
+      "Bash(pytest *)",
+      "Read",
+      "Write",
+      "Edit",
+      "Read(//tmp/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\win\\Desktop\\workspace\\test\\nongji-alert\\backend"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -13,18 +29,6 @@
           }
         ]
       }
-    ]
-  },
-  "permissions": {
-    "allow": [
-      "Bash(git *)",
-      "Bash(npm *)",
-      "Bash(py *)",
-      "Bash(python *)",
-      "Bash(pytest *)",
-      "Read",
-      "Write",
-      "Edit"
     ]
   }
 }

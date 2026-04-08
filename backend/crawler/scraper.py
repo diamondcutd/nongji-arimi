@@ -43,7 +43,7 @@ def _resolve_biz_type_code(raw_text: str) -> str | None:
     return "D1" if trade == "매도" else "D2"
 
 
-def _build_url(sido_cd: str, page_no: int = 1) -> str:
+def _build_url(sido_cd: str, sigun_cd: str = "", page_no: int = 1) -> str:
     """검색 GET URL 생성"""
     params = {
         "menuId": "020020",
@@ -53,11 +53,34 @@ def _build_url(sido_cd: str, page_no: int = 1) -> str:
         "currentPageNo": page_no,
         "recordCountPerPage": PER_PAGE,
     }
+    if sigun_cd:
+        params["schSigunCd"] = sigun_cd
     return f"{FBO_BASE_URL}?{urlencode(params)}"
 
 
+def _get_sigun_codes(page, sido_cd: str) -> list[str]:
+    """시도 페이지에서 시군구 코드 목록 추출 (동적 로드)"""
+    url = _build_url(sido_cd)
+    page.goto(url, wait_until="networkidle", timeout=30000)
+    page.wait_for_timeout(1500)
+
+    options = page.eval_on_selector_all(
+        "select[name='schSigunCd'] option",
+        "els => els.filter(o => o.value).map(o => o.value)",
+    )
+    return options
+
+
+def _get_total_count(soup) -> int:
+    """페이지에서 총 건수 추출"""
+    total_el = soup.select_one(".ddfs_list_header .total-filter h3 span")
+    return int(total_el.get_text(strip=True)) if total_el else 0
+
+
 def crawl_listings() -> list[dict]:
-    """전국 시도를 순회하며 농지은행 매물 전체 수집"""
+    """전국 시도를 순회하며 농지은행 매물 전체 수집.
+    한 시도의 총 건수가 PER_PAGE 이상이면 시군구별로 분할 크롤링.
+    """
     results = []
     seen_keys: set[str] = set()
 
@@ -67,9 +90,45 @@ def crawl_listings() -> list[dict]:
 
         for sido_cd in SIDO_CODES:
             try:
-                sido_listings = _crawl_sido(page, sido_cd, seen_keys)
-                results.extend(sido_listings)
-                logger.info(f"시도 {sido_cd}: {len(sido_listings)}건 수집")
+                # 1차: 시도 전체 조회
+                url = _build_url(sido_cd)
+                page.goto(url, wait_until="networkidle", timeout=30000)
+                page.wait_for_timeout(1500)
+
+                html = page.content()
+                soup = BeautifulSoup(html, "lxml")
+                total_count = _get_total_count(soup)
+
+                if total_count >= PER_PAGE:
+                    # 100건 이상이면 시군구별 분할 크롤링
+                    sigun_codes = page.eval_on_selector_all(
+                        "select[name='schSigunCd'] option",
+                        "els => els.filter(o => o.value).map(o => o.value)",
+                    )
+                    logger.info(
+                        f"시도 {sido_cd}: {total_count}건 (≥{PER_PAGE}) → "
+                        f"시군구 {len(sigun_codes)}개로 분할 크롤링"
+                    )
+                    sido_total = 0
+                    for sigun_cd in sigun_codes:
+                        try:
+                            sigun_listings = _crawl_sido(
+                                page, sido_cd, seen_keys, sigun_cd=sigun_cd
+                            )
+                            results.extend(sigun_listings)
+                            sido_total += len(sigun_listings)
+                        except Exception:
+                            logger.exception(
+                                f"시군구 {sigun_cd} 크롤링 실패"
+                            )
+                        time.sleep(REQUEST_DELAY)
+                    logger.info(f"시도 {sido_cd}: 총 {sido_total}건 수집 (분할)")
+                else:
+                    # 100건 미만이면 현재 페이지에서 바로 파싱
+                    sido_listings = _parse_page_listings(soup, seen_keys)
+                    results.extend(sido_listings)
+                    logger.info(f"시도 {sido_cd}: {len(sido_listings)}건 수집")
+
             except Exception:
                 logger.exception(f"시도 {sido_cd} 크롤링 실패")
 
@@ -81,13 +140,38 @@ def crawl_listings() -> list[dict]:
     return results
 
 
-def _crawl_sido(page, sido_cd: str, seen_keys: set) -> list[dict]:
-    """한 시도의 전체 페이지를 수집"""
+def _parse_page_listings(soup, seen_keys: set) -> list[dict]:
+    """이미 로드된 BeautifulSoup 페이지에서 매물 목록 파싱"""
+    listings: list[dict] = []
+
+    table = soup.select_one("table.table-toggle")
+    if not table:
+        return listings
+
+    rows = table.select("tbody tr")
+    for row in rows:
+        cols = row.select("td")
+        if len(cols) < 9:
+            continue
+        listing = _parse_row(cols)
+        if not listing:
+            continue
+        if listing["listing_key"] in seen_keys:
+            continue
+        seen_keys.add(listing["listing_key"])
+        listings.append(listing)
+
+    return listings
+
+
+def _crawl_sido(page, sido_cd: str, seen_keys: set,
+                sigun_cd: str = "") -> list[dict]:
+    """한 시도(또는 시군구)의 전체 페이지를 수집"""
     listings: list[dict] = []
     page_no = 1
 
     while True:
-        url = _build_url(sido_cd, page_no)
+        url = _build_url(sido_cd, sigun_cd=sigun_cd, page_no=page_no)
         page.goto(url, wait_until="networkidle", timeout=30000)
         page.wait_for_timeout(1500)
 
@@ -95,38 +179,16 @@ def _crawl_sido(page, sido_cd: str, seen_keys: set) -> list[dict]:
         soup = BeautifulSoup(html, "lxml")
 
         # 총 건수 확인
-        total_el = soup.select_one(".ddfs_list_header .total-filter h3 span")
-        total_count = int(total_el.get_text(strip=True)) if total_el else 0
+        total_count = _get_total_count(soup)
         if total_count == 0:
             break
 
-        # 매물 테이블 파싱
-        table = soup.select_one("table.table-toggle")
-        if not table:
-            break
-
-        rows = table.select("tbody tr")
-        if not rows:
-            break
-
-        page_count = 0
-        for row in rows:
-            cols = row.select("td")
-            if len(cols) < 9:
-                continue
-
-            listing = _parse_row(cols)
-            if not listing:
-                continue
-            if listing["listing_key"] in seen_keys:
-                continue
-
-            seen_keys.add(listing["listing_key"])
-            listings.append(listing)
-            page_count += 1
+        # 매물 파싱
+        page_listings = _parse_page_listings(soup, seen_keys)
+        listings.extend(page_listings)
 
         # 다음 페이지 여부 판단
-        if page_count == 0:
+        if len(page_listings) == 0:
             break
 
         total_pages = (total_count + PER_PAGE - 1) // PER_PAGE

@@ -110,6 +110,44 @@ def insert_snapshot(conn, listing_id: str, snapshot: dict):
         return False
 
 
+def expire_unseen_listings(conn, seen_listing_keys: list[str]):
+    """크롤링에서 발견되지 않은 active 매물을 expired로 변경.
+
+    농지은행에서 내려간(마감/종료) 매물을 자동 비활성화.
+    단, 상시(deadline IS NULL) 매물은 3일 연속 미발견 시에만 만료 처리.
+    """
+    if not seen_listing_keys:
+        return 0
+
+    with conn.cursor() as cur:
+        # 이번 크롤링에서 발견된 매물 제외, active인 것만 만료 처리
+        # deadline이 있고 이미 지난 매물은 즉시 만료
+        # deadline이 NULL(상시)인 매물은 last_seen_at이 3일 이상 지난 경우만 만료
+        cur.execute("""
+            UPDATE listings
+            SET status = 'expired'
+            WHERE status = 'active'
+              AND listing_key != ALL(%s)
+              AND (
+                  (last_seen_at < NOW() - INTERVAL '3 days')
+                  OR
+                  (id IN (
+                      SELECT sub.listing_id FROM (
+                          SELECT DISTINCT ON (listing_id) listing_id, deadline
+                          FROM listing_snapshots
+                          ORDER BY listing_id, crawled_at DESC
+                      ) sub
+                      WHERE sub.listing_id = listings.id
+                      AND sub.deadline IS NOT NULL
+                      AND sub.deadline < CURRENT_DATE
+                  ))
+              )
+            RETURNING id
+        """, (seen_listing_keys,))
+        expired = cur.fetchall()
+        return len(expired)
+
+
 def get_new_listings(conn):
     """알림 미발송 매물 조회"""
     with conn.cursor() as cur:

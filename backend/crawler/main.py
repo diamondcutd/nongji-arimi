@@ -10,6 +10,7 @@ from crawler.db import (
     upsert_listing,
     insert_snapshot,
     find_region_id,
+    expire_unseen_listings,
 )
 from matcher import run_matcher
 
@@ -35,6 +36,7 @@ def crawl_and_notify():
         conn = get_connection()
         new_count = 0
         changed_count = 0
+        seen_keys = []
 
         try:
             for item in listings:
@@ -54,6 +56,7 @@ def crawl_and_notify():
                 }
 
                 listing_id, is_new = upsert_listing(conn, listing_data)
+                seen_keys.append(item["listing_key"])
 
                 snapshot_data = {
                     "price": item.get("price"),
@@ -68,6 +71,11 @@ def crawl_and_notify():
                     new_count += 1
                 elif was_inserted:
                     changed_count += 1
+
+            # 농지은행에서 사라진 매물 만료 처리
+            expired_count = expire_unseen_listings(conn, seen_keys)
+            if expired_count > 0:
+                logger.info("만료 처리: %d건 (농지은행에서 내려간 매물)", expired_count)
 
             conn.commit()
             unchanged = len(listings) - new_count - changed_count

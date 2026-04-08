@@ -4,53 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>대시보드 — 농지알리미</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg:           #F7F7F8;
-  --card:         #FFFFFF;
-  --text:         #202123;
-  --sub:          #6b7280;
-  --border:       rgba(0,0,0,0.08);
-  --header-bd:    rgba(0,0,0,0.07);
-  --hbtn-color:   #202123;
-  --hbtn-border:  rgba(0,0,0,0.18);
-  --icon-bg:      #FFF7E6;
-  --icon-border:  rgba(245,158,11,0.2);
-  --badge-bg:     #FFF7E6;
-  --badge-color:  #B45309;
+  --green:        #10B981;
+  --green-dark:   #059669;
+  --green-light:  #D1FAE5;
+  --green-bg:     #ECFDF5;
+  --bg:           #FFFFFF;
+  --card:         #F9FAFB;
+  --text:         #111827;
+  --sub:          #6B7280;
+  --border:       #F3F4F6;
+  --header-bd:    #F3F4F6;
+  --icon-bg:      #ECFDF5;
+  --icon-border:  rgba(16,185,129,0.2);
+  --badge-bg:     #ECFDF5;
+  --badge-color:  #059669;
   --input-bg:     #FFFFFF;
-  --input-border: rgba(0,0,0,0.15);
-  --input-focus:  #F59E0B;
-  --footer-color: #b0b0b0;
+  --input-border: #E5E7EB;
+  --input-focus:  #10B981;
+  --footer-color: #9CA3AF;
   --empty-color:  #d1d5db;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:           #202123;
-    --card:         #2A2B32;
-    --text:         #FFFFFF;
-    --sub:          #B4B7C1;
-    --border:       rgba(255,255,255,0.07);
-    --header-bd:    rgba(255,255,255,0.07);
-    --hbtn-color:   #B4B7C1;
-    --hbtn-border:  rgba(255,255,255,0.15);
-    --icon-bg:      rgba(245,158,11,0.1);
-    --icon-border:  rgba(245,158,11,0.2);
-    --badge-bg:     rgba(245,158,11,0.12);
-    --badge-color:  #F59E0B;
-    --input-bg:     #2A2B32;
-    --input-border: rgba(255,255,255,0.15);
-    --input-focus:  #F59E0B;
-    --footer-color: #4a4b52;
-    --empty-color:  #4a4b52;
+    --green:        #34D399;
+    --green-dark:   #10B981;
+    --green-light:  rgba(52,211,153,0.15);
+    --green-bg:     rgba(52,211,153,0.1);
+    --bg:           #111827;
+    --card:         #1F2937;
+    --text:         #F9FAFB;
+    --sub:          #9CA3AF;
+    --border:       #374151;
+    --header-bd:    #374151;
+    --icon-bg:      rgba(52,211,153,0.1);
+    --icon-border:  rgba(52,211,153,0.25);
+    --badge-bg:     rgba(52,211,153,0.12);
+    --badge-color:  #34D399;
+    --input-bg:     #1F2937;
+    --input-border: #374151;
+    --input-focus:  #34D399;
+    --footer-color: #4B5563;
+    --empty-color:  #4B5563;
   }
 }
 
 body {
-  font-family: -apple-system, 'Pretendard', sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
   color: var(--text);
   max-width: 420px;
@@ -63,7 +69,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 0.5px solid var(--header-bd);
+  border-bottom: 1px solid var(--header-bd);
 }
 .header-logo {
   font-size: 17px;
@@ -72,11 +78,11 @@ body {
   color: var(--text);
   text-decoration: none;
 }
-.header-logo em { font-style: normal; color: #F59E0B; }
+.header-logo em { font-style: normal; color: var(--green); }
 .header-login {
   background: transparent;
-  border: 0.5px solid var(--hbtn-border);
-  color: var(--hbtn-color);
+  border: 1px solid var(--border);
+  color: var(--sub);
   padding: 6px 13px;
   font-size: 12px;
   font-weight: 500;
@@ -90,7 +96,7 @@ body {
   margin: 24px 20px 0;
   padding: 22px 20px;
   background: var(--card);
-  border: 0.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: 16px;
 }
 .user-card .greeting {
@@ -98,7 +104,7 @@ body {
   font-weight: 700;
   letter-spacing: -0.4px;
 }
-.user-card .greeting span { color: #F59E0B; }
+.user-card .greeting span { color: var(--green); }
 .user-meta {
   display: flex;
   gap: 16px;
@@ -132,7 +138,7 @@ body {
   letter-spacing: -0.3px;
 }
 .add-btn {
-  background: #F59E0B;
+  background: var(--green);
   color: #fff;
   border: none;
   padding: 7px 14px;
@@ -141,11 +147,13 @@ body {
   font-family: inherit;
   border-radius: 9px;
   cursor: pointer;
+  transition: background 0.2s;
 }
+.add-btn:hover { background: var(--green-dark); }
 
 .condition-card {
   background: var(--card);
-  border: 0.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 16px 18px;
 }
@@ -163,7 +171,7 @@ body {
 .tag {
   display: inline-block;
   background: var(--icon-bg);
-  border: 0.5px solid var(--icon-border);
+  border: 1px solid var(--icon-border);
   color: var(--badge-color);
   padding: 3px 10px;
   border-radius: 8px;
@@ -184,7 +192,7 @@ body {
   cursor: pointer;
   font-family: inherit;
 }
-.condition-card .edit-btn:hover { color: #F59E0B; }
+.condition-card .edit-btn:hover { color: var(--green); }
 .condition-card .delete-btn:hover { color: #ef4444; }
 
 .empty {
@@ -257,12 +265,12 @@ body {
   user-select: none;
 }
 .checkbox-group label:has(input:checked) {
-  border-color: #F59E0B;
-  background: var(--icon-bg);
+  border-color: var(--green);
+  background: var(--green-bg);
 }
 .checkbox-group input[type="checkbox"] {
   width: 15px; height: 15px;
-  accent-color: #F59E0B;
+  accent-color: var(--green);
 }
 .cb-divider {
   width: 100%;
@@ -287,19 +295,21 @@ body {
 .btn-cancel {
   background: var(--card);
   color: var(--sub);
-  border: 0.5px solid var(--border) !important;
+  border: 1px solid var(--border) !important;
 }
 .btn-save {
-  background: #F59E0B;
+  background: var(--green);
   color: #fff;
+  transition: background 0.2s;
 }
+.btn-save:hover { background: var(--green-dark); }
 
 /* ── 계정 설정 섹션 ── */
 .account-section {
   margin: 0 20px;
   padding: 18px 20px;
   background: var(--card);
-  border: 0.5px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: 14px;
 }
 .account-section .section-title {
@@ -323,7 +333,7 @@ body {
   border-radius: 10px;
   cursor: pointer;
 }
-.btn-dormant:hover { border-color: #F59E0B; color: var(--text); }
+.btn-dormant:hover { border-color: var(--green); color: var(--text); }
 .btn-withdraw {
   background: none;
   color: #ef4444;
@@ -472,7 +482,7 @@ body {
   </div>
 </div>
 
-<footer class="footer">&copy; 2025 농지알리미</footer>
+<footer class="footer">&copy; 2026 농지알리미</footer>
 
 <div class="toast" id="toast"></div>
 
@@ -607,14 +617,13 @@ async function loadConditions() {
 
 // ── 모달 ──
 var modal = document.getElementById('modal');
-var editingConditionId = null;  // null=추가모드, string=수정모드
+var editingConditionId = null;
 
 function openAddModal() {
   editingConditionId = null;
   document.querySelector('.modal h2').textContent = '알림 조건 추가';
   document.querySelector('.btn-save').textContent = '저장';
   document.getElementById('conditionForm').reset();
-  // 드롭다운 초기화
   document.getElementById('cSigun').innerHTML = '<option value="">시군구 선택</option>';
   document.getElementById('cSigun').disabled = true;
   document.getElementById('cEupmyeon').innerHTML = '<option value="">읍면동 선택 (선택사항)</option>';
@@ -631,19 +640,16 @@ async function openEditModal(conditionId) {
   document.querySelector('.btn-save').textContent = '수정';
   document.getElementById('conditionForm').reset();
 
-  // 기본 필드 채우기
   document.getElementById('cLabel').value = c.label || '';
   document.getElementById('cLandCategory').value = c.land_category || '';
   document.getElementById('cAreaMin').value = c.area_min || '';
   document.getElementById('cAreaMax').value = c.area_max || '';
   document.getElementById('cPriceMax').value = c.price_max || '';
 
-  // biz_type 체크박스 복원
   document.querySelectorAll('#cBizType input').forEach(function(cb) {
     cb.checked = c.biz_type && c.biz_type.indexOf(cb.value) !== -1;
   });
 
-  // 지역 드롭다운 복원
   var sidoSel = document.getElementById('cSido');
   var sigunSel = document.getElementById('cSigun');
   var eupmyeonSel = document.getElementById('cEupmyeon');
@@ -661,7 +667,6 @@ async function openEditModal(conditionId) {
         if (anc.sido_id) {
           sidoSel.value = anc.sido_id;
 
-          // 시군구 로드
           var sgRes = await fetch(API + '/regions/sigun?sido_id=' + encodeURIComponent(anc.sido_id));
           if (sgRes.ok) {
             var sgList = await sgRes.json();
@@ -673,7 +678,6 @@ async function openEditModal(conditionId) {
             if (anc.sigun_id) {
               sigunSel.value = anc.sigun_id;
 
-              // 읍면동 로드
               var emRes = await fetch(API + '/regions/eupmyeon?sigun_id=' + encodeURIComponent(anc.sigun_id));
               if (emRes.ok) {
                 var emList = await emRes.json();
@@ -790,7 +794,6 @@ document.getElementById('conditionForm').addEventListener('submit', async functi
   var areaMax = document.getElementById('cAreaMax').value;
   var priceMax = document.getElementById('cPriceMax').value;
 
-  // 면적 범위 검증
   if (areaMin && areaMax) {
     var min = parseInt(areaMin);
     var max = parseInt(areaMax);
@@ -800,7 +803,6 @@ document.getElementById('conditionForm').addEventListener('submit', async functi
     }
   }
 
-  // 지역: 읍면동 > 시군구 > 시도 순으로 가장 구체적인 region_id 사용
   var regionId = document.getElementById('cEupmyeon').value
     || document.getElementById('cSigun').value
     || document.getElementById('cSido').value;
@@ -914,6 +916,18 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
   localStorage.removeItem('token');
   location.href = 'index.html';
 });
+
+// ── 카카오 로그인 후 URL 토큰 처리 ──
+(function() {
+  var params = new URLSearchParams(location.search);
+  var token = params.get('token');
+  if (token) {
+    localStorage.setItem('token', token);
+    // URL에서 token 파라미터 제거 (보안)
+    var cleanUrl = location.pathname;
+    history.replaceState(null, '', cleanUrl);
+  }
+})();
 
 // ── 초기 로드 ──
 loadUser();
