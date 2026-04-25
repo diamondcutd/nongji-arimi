@@ -1,3 +1,9 @@
+> ⚠️ **Legacy v0 — not maintained**.
+> Active project: [arimi-workspace](https://github.com/diamondcutd/arimi-workspace)
+> 이 repo 는 2026-04-25 에 archive 됨. v1 (현 아리미) 은 위 링크 참조.
+>
+> ---
+
 # 농지알리미
 
 카카오톡 채널 기반 농지 알림 서비스
